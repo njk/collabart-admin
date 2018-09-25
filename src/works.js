@@ -1,6 +1,7 @@
 import React from 'react';
 import { FormTab, TabbedForm, List, Edit, Create, Datagrid, TextField, RichTextField, DateField, ReferenceArrayField, SingleFieldList, EditButton, SimpleForm, TextInput, NumberInput, BooleanInput, DateInput, ReferenceArrayInput, SelectArrayInput, Filter } from 'react-admin';
-import CloudinaryUpload from './CloudinaryUpload'
+import CloudinaryUpload from './CloudinaryUpload';
+import CloudinaryWorkImage from './CloudinaryWorkImage';
 import { Image, Transformation } from 'cloudinary-react';
 import EditImageButton from './EditImageButton';
 import { EditNoteButton } from './NoteButtons';
@@ -69,6 +70,11 @@ const NameField = ( { record }) =>
 const CloudinaryInput = ({record}) => {
 
 	return (<CloudinaryUpload record={record}/>)
+}
+
+const WorkImageCloudinaryInput = ({record}) => {
+
+	return (<CloudinaryWorkImage record={record}/>)
 }
 
 const CloudinaryImageField = ({record}) => {
@@ -153,6 +159,8 @@ export const WorksEdit = (props) => (
 				</ReferenceArrayInput>
 				<DimensionsInput />
 				<DateInput source="publishedDate" />
+            <SmallImageField source="image" label="Abbildung" />				
+				<WorkImageCloudinaryInput />
 		    </FormTab>
 		    <FormTab label="Notizen" path="notes">
 	    		<ReferenceArrayField

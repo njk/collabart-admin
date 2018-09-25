@@ -44,3 +44,25 @@ export const workImagesUpdate = (id, work) => ({
     	}
     },
 });
+
+export const WORK_IMAGE_UPDATE = 'WORK_IMAGE_UPDATE';
+export const workImageUpdate = (id, work) => ({
+    type: WORK_IMAGE_UPDATE,
+    payload: { id, data: { ...work } },
+    meta: { 
+    	fetch: UPDATE, 
+    	resource: 'works',
+    	onSuccess: {
+    		notification: {
+    	    		body: 'Abbildung wurde dem Werk zugeordnet.',
+    	    		level: 'info'
+    	    }
+    	},
+    	onFailure: {
+    		notification: {
+    	    		body: 'Fehler: Abbildung wurde dem Werk nicht zugeordnet.',
+    	    		level: 'warning'
+    	    }
+    	}
+    },
+});
