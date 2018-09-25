@@ -26,7 +26,7 @@
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
-#dropbox { 
+.dropbox { 
   border: 4px dashed #ccc; 
   padding-left: 8px;
 }
@@ -50,6 +50,6 @@
   background-color: #ff0000;
   width: 0;
 }
-#fileElem{
+.file-elem{
   display:none;
 }

@@ -11,25 +11,14 @@ class CloudinaryUpload extends Component {
 		super(props, context);
 		this.state = { uploadedPhotos: [] };
 		this.photoId = 1;
+		this.handleFiles = this.handleFiles.bind(this);
+		this.drop = this.drop.bind(this);
+		this.fileInput = React.createRef();
+		this.progressBar = React.createRef();
+		this.progressElement = React.createRef();
 	}
 
 	componentDidMount() {
-
-
-		var dropbox = document.getElementById("dropbox");
-		dropbox.addEventListener("dragenter", this.dragenter, false);
-		dropbox.addEventListener("dragover", this.dragover, false);
-		dropbox.addEventListener("drop", this.drop, false);
-
-		var fileSelect = document.getElementById("fileSelect"),
-		fileElem = document.getElementById("fileElem");
-
-		fileSelect.addEventListener("click", function(e) {
-			if (fileElem) {
-				fileElem.click();
-			}
-	  e.preventDefault(); // prevent navigation to "#"
-	}, false);	
 
 	}
 
@@ -42,16 +31,16 @@ class CloudinaryUpload extends Component {
 		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
 	  // Reset the upload progress bar
-	  document.getElementById('progress').style.width = 0;
+	  this.progressElement.current.style.width = 0;
 	  
 	  // Update progress (can be used to show progress indicator)
 	  xhr.upload.addEventListener("progress", function(e) {
 	  	var progress = Math.round((e.loaded * 100.0) / e.total);
-	  	document.getElementById('progress').style.width = progress + "%";
+	  	this.progressElement.current.style.width = progress + "%";
 
 	  	console.log(`fileuploadprogress data.loaded: ${e.loaded},
 	  		data.total: ${e.total}`);
-	  });
+	  }.bind(this));
 
 	  xhr.onreadystatechange = function(e) {
 	  	if (xhr.readyState == 4 && xhr.status == 200) {
@@ -63,15 +52,6 @@ class CloudinaryUpload extends Component {
 	      this.setState({
 	      	uploadedPhotos: this.state.uploadedPhotos
 	      });
-	      // https://res.cloudinary.com/cloudName/image/upload/v1483481128/public_id.jpg
-	      var url = response.secure_url;
-	      // Create a thumbnail of the uploaded image, with 150px width
-	      var tokens = url.split('/');
-	      tokens.splice(-2, 0, 'w_150,c_scale');
-	      var img = new Image(); // HTML5 Constructor
-	      img.src = tokens.join('/');
-	      img.alt = response.public_id;
-	      document.getElementById('gallery').appendChild(img);
 	  }
 	}.bind(this);
 
@@ -127,24 +107,29 @@ class CloudinaryUpload extends Component {
 
 	render() {
 		return (
-			<div id="dropbox">
+			<div className="dropbox" onDragEnter={this.dragenter} onDragOver={this.dragover} onDrop={this.drop}>
 				<div className="form_line">
 					<h4>Neue Abbildungen hier hineindroppen.</h4>
 					<div className="form_controls">
 						<div className="upload_button_holder">
-							<input type="file" id="fileElem" multiple accept="image/*"
+							<input type="file" className="file-elem" ref={this.fileInput} multiple accept="image/*"
 								onChange={ e => { 
 									this.handleFiles(e.target.files)
 								}
 								}/>
-							<a href="#" id="fileSelect">Dateien auswählen</a>
+							<a href="#" 
+								onClick={(
+										(e) => {
+											this.fileInput.current.click();
+											e.preventDefault();
+											}
+								).bind(this)}>Dateien auswählen</a>
 						</div>
 					</div>
 				</div>
-				<div className="progress-bar" id="progress-bar">
-					<div className="progress" id="progress"></div>
+				<div className="progress-bar" ref={this.progressBar} >
+					<div className="progress" ref={this.progressElement} ></div>
 				</div>
-				<div id="gallery" />
 			</div>
 			);
 		}
