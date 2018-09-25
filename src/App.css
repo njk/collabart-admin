@@ -1,0 +1,55 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  animation: App-logo-spin infinite 20s linear;
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  height: 150px;
+  padding: 20px;
+  color: white;
+}
+
+.App-title {
+  font-size: 1.5em;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+@keyframes App-logo-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+#dropbox { 
+  border: 4px dashed #ccc; 
+  padding-left: 8px;
+}
+.my-form {
+  margin-top: 10px;
+}
+.gallery {
+  margin: 10px;
+}
+.gallery img {
+  margin-left: 16px;
+}
+.progress-bar{
+  width: 200px;
+  position: relative;
+  height: 8px;
+  margin-top: 4px;
+}
+.progress-bar .progress{
+  height: 8px;
+  background-color: #ff0000;
+  width: 0;
+}
+#fileElem{
+  display:none;
+}
