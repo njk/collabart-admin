@@ -48,8 +48,8 @@ const DimensionsInput = ( { record } ) =>
 	{
 		return (
 			<span>
-				<NumberInput source="dimensions.width" label="Breite" />
 				<NumberInput source="dimensions.height" label="Höhe" />
+				<NumberInput source="dimensions.width" label="Breite" />
 				<NumberInput source="dimensions.depth" label="Tiefe" />
 			</span>
 		    )
