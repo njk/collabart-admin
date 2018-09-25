@@ -148,6 +148,7 @@ const WorksTitle = ({ record }) => {
 };
 
 const artistInputRenderer = choice => `${choice.name.first} ${choice.name.last}`;
+const techniquesInputRenderer = choice => `${choice.name}`;
 
 export const WorksEdit = (props) => (
 	<Edit {...props} title={<WorksTitle />}>
@@ -158,7 +159,10 @@ export const WorksEdit = (props) => (
 					<SelectArrayInput optionText={artistInputRenderer} />
 				</ReferenceArrayInput>
 				<DimensionsInput />
-				<DateInput source="publishedDate" />
+				<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'}>
+					<SelectArrayInput optionText={techniquesInputRenderer} />
+				</ReferenceArrayInput>
+				<DateInput source="publishedDate" label="Jahr"/>
             <SmallImageField source="image" label="Abbildung" />				
 				<WorkImageCloudinaryInput />
 		    </FormTab>
