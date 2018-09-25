@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormTab, TabbedForm, List, Edit, Create, Datagrid, TextField, RichTextField, DateField, ReferenceArrayField, SingleFieldList, EditButton, SimpleForm, TextInput, NumberInput, BooleanInput, DateInput, ReferenceArrayInput, SelectArrayInput, Filter } from 'react-admin';
+import { FormTab, TabbedForm, List, Edit, Create, Datagrid, ArrayField, TextField, RichTextField, DateField, ReferenceArrayField, SingleFieldList, EditButton, SimpleForm, ReferenceInput, AutocompleteInput, TextInput, NumberInput, BooleanInput, DateInput, ReferenceArrayInput, SelectArrayInput, Filter } from 'react-admin';
 import CloudinaryUpload from './CloudinaryUpload';
 import CloudinaryWorkImage from './CloudinaryWorkImage';
 import { Image, Transformation } from 'cloudinary-react';
@@ -9,7 +9,14 @@ import WorkNoteAdd from './WorkNoteAdd'
 
 const WorksFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="Search" source="q" alwaysOn />
+        <TextInput label="Titel" source="title" />
+        <ReferenceInput source="artists" reference="artists" label="Künstler" alwaysOn>
+            <AutocompleteInput
+                optionText={choice =>
+                    `${choice.name.first} ${choice.name.last}`
+                }
+            />
+        </ReferenceInput>        
     </Filter>
 );
 
@@ -27,14 +34,14 @@ const SmallImageField = ( { record } ) =>
 	: null;
 
 const ImagesField = ( { record } ) => 
-	record && record.public_id
+	record && record.images
 	? 
 		(
 			<span>
 				&#8226;
 			</span>
 		)
-	: (<span>kein Bild</span>);	
+	: (<span></span>);	
 
 const DimensionsField = ( { record } ) => 
 	{
@@ -96,7 +103,7 @@ const SharingInputs = ({ record }) =>
 	)
 
 export const WorksList = (props) => (
-    <List {...props} title="Werke" filters={<WorksFilter />}>
+    <List {...props} title="Werke" filters={<WorksFilter />} perPage={25}>
         <Datagrid>
             <SmallImageField source="image" label="Abbildung" />
 			<ReferenceArrayField
@@ -129,15 +136,14 @@ export const WorksList = (props) => (
 			        <RichTextField source="note" /> 
 			    </SingleFieldList>
 			</ReferenceArrayField>
-			<ReferenceArrayField
+			<ArrayField
 			    label="Bilder"
-			    reference="images"
 			    source="images"
 			>
 			    <SingleFieldList>
 			        <ImagesField /> 
 			    </SingleFieldList>
-			</ReferenceArrayField>
+			</ArrayField>
             <EditButton />
         </Datagrid>
     </List>
