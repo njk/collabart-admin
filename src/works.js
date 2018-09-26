@@ -103,7 +103,7 @@ const SharingInputs = ({ record }) =>
 	)
 
 export const WorksList = (props) => (
-    <List {...props} title="Werke" filters={<WorksFilter />} perPage={25}>
+    <List {...props} title="Werke" filters={<WorksFilter />} perPage={20}>
         <Datagrid>
             <SmallImageField source="image" label="Abbildung" />
 			<ReferenceArrayField
