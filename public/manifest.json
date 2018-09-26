@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Werkliste",
+  "name": "Werkliste. Kunst organisieren.",
   "icons": [
     {
       "src": "favicon.ico",
