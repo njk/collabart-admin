@@ -23,7 +23,8 @@ const InformationTitle = ({ record }) => {
 
 export const InformationEdit = (props) => (
     <Edit title={<InformationTitle />} {...props}>
-        <SimpleForm>
+        <SimpleForm redirect={props.history.goBack}>
+            <TextInput label="Lagerort" source="location"/>
         </SimpleForm>
     </Edit>
 );

@@ -1,16 +1,38 @@
 import React from 'react';
-import { FormTab, TabbedForm, List, Edit, Create, Datagrid, ArrayField, TextField, RichTextField, DateField, ReferenceArrayField, SingleFieldList, EditButton, SimpleForm, ReferenceInput, AutocompleteInput, TextInput, NumberInput, BooleanInput, DateInput, ReferenceArrayInput, SelectArrayInput, Filter } from 'react-admin';
+import { Show, SimpleShowLayout, FormTab, TabbedForm, List, Edit, Create, Datagrid, ReferenceField, ArrayField, TextField, RichTextField, DateField, ReferenceArrayField, SingleFieldList, ShowButton, EditButton, SimpleForm, SelectInput, ReferenceInput, AutocompleteInput, TextInput, NumberInput, BooleanInput, DateInput, ReferenceArrayInput, SelectArrayInput, Filter } from 'react-admin';
 import CloudinaryUpload from './CloudinaryUpload';
 import CloudinaryWorkImage from './CloudinaryWorkImage';
 import { Image, Transformation } from 'cloudinary-react';
 import EditImageButton from './EditImageButton';
+import { EditLocationButton } from './LocationButtons';
 import { EditNoteButton } from './NoteButtons';
 import WorkNoteAdd from './WorkNoteAdd'
+import WorkLocationAdd from './WorkLocationAdd'
 
 const WorksFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Titel" source="title" />
-        <ReferenceInput source="artists" reference="artists" label="Künstler" alwaysOn>
+        <ReferenceInput 
+        	source="notes" 
+        	reference="notes" 
+        	label="Notizen"
+        	perPage={10} 
+        	sort={{ field: 'note', order: 'ASC' }}
+        	filterToQuery={searchText => ({ 'note': searchText })} >
+            <AutocompleteInput
+                optionText={choice =>
+                    `${choice.note}`
+                }
+            />
+        </ReferenceInput> 
+        <ReferenceInput 
+        	source="artists" 
+        	reference="artists" 
+        	label="Künstler"
+        	perPage={10} 
+        	sort={{ field: 'name.last', order: 'ASC' }}
+        	filterToQuery={searchText => ({ 'name.last': searchText })}
+        	alwaysOn>
             <AutocompleteInput
                 optionText={choice =>
                     `${choice.name.first} ${choice.name.last}`
@@ -19,6 +41,15 @@ const WorksFilter = (props) => (
         </ReferenceInput>        
     </Filter>
 );
+
+const ReferenceSearchInput = ( { choices } ) => 
+	{
+		return (
+			<span>
+				<TextInput />
+			</span>
+		    )
+	}
 
 const SmallImageField = ( { record } ) => 
 	record && record.image
@@ -74,6 +105,30 @@ const NameField = ( { record }) =>
 		: null
 }
 
+const LocationInput = ( { record }) => 
+{
+	return record && record.name
+		?
+		(
+			<span>
+				{record.name}<br/>ändern
+			</span>
+		)
+		: 'kein Ort'
+}
+
+const LocationField = ( { record }) => 
+{
+	return record && record.name
+		?
+		(
+			<span>
+				{record.name}
+			</span>
+		)
+		: 'kein Ort'
+}
+
 const CloudinaryInput = ({record}) => {
 
 	return (<CloudinaryUpload record={record}/>)
@@ -127,7 +182,14 @@ export const WorksList = (props) => (
 			    </SingleFieldList>
 			</ReferenceArrayField>
 			<DateField label="Jahr" source="publishedDate" options={{ year: 'numeric' }}/>
-			<ReferenceArrayField
+			<ReferenceField
+		          reference="locations"
+		          source="locations"
+		          label="Lagerort"
+		        >
+		          	<LocationField source="name" />
+		        </ReferenceField>			
+		    <ReferenceArrayField
 			    label="Notizen"
 			    reference="notes"
 			    source="notes"
@@ -144,6 +206,7 @@ export const WorksList = (props) => (
 			        <ImagesField /> 
 			    </SingleFieldList>
 			</ArrayField>
+			<ShowButton />
             <EditButton />
         </Datagrid>
     </List>
@@ -172,6 +235,16 @@ export const WorksEdit = (props) => (
             <SmallImageField source="image" label="Abbildung" />				
 				<WorkImageCloudinaryInput />
 		    </FormTab>
+		    <FormTab label="Lagerinformationen" path="store">
+	    		<ReferenceField
+			          reference="locations"
+			          source="locations"
+			          label="Lagerort"
+			        >
+			          	<LocationInput source="name" />
+		        </ReferenceField>
+		        <WorkLocationAdd />	
+		    </FormTab>
 		    <FormTab label="Notizen" path="notes">
 	    		<ReferenceArrayField
 			          reference="notes"
@@ -181,7 +254,7 @@ export const WorksEdit = (props) => (
 			        >
 			          <Datagrid>
 						<RichTextField source="note" label="Notizen"/>
-						<EditNoteButton/>
+						<EditNoteButton />
 			          </Datagrid>
 		        </ReferenceArrayField>
 		        <WorkNoteAdd />		        
@@ -218,4 +291,42 @@ export const WorksCreate = (props) => (
 			</ReferenceArrayInput>                
         </SimpleForm>
     </Create>
+);
+
+export const WorksShow = (props) => (
+    <Show {...props} title={<WorksTitle />}>
+        <SimpleShowLayout>
+            <SmallImageField source="image" label="Abbildung" />
+            <ReferenceArrayField
+			    label="Künstler"
+			    reference="artists"
+			    source="artists"
+			>
+			    <SingleFieldList>
+			        <NameField />
+			    </SingleFieldList>
+			</ReferenceArrayField>
+			<TextField source="title" />
+            <DimensionsField label="Maße" source="dimensions"/>
+ 			<ReferenceArrayField
+			    label="Techniken"
+			    reference="techniques"
+			    source="techniques"
+			>
+			    <SingleFieldList>
+			        <TextField source="name" /> 
+			    </SingleFieldList>
+			</ReferenceArrayField>
+			<DateField label="Jahr" source="publishedDate" options={{ year: 'numeric' }}/>
+			<ReferenceArrayField
+			    label="Notizen"
+			    reference="notes"
+			    source="notes"
+			>
+			    <SingleFieldList>
+			        <RichTextField source="note" /> 
+			    </SingleFieldList>
+			</ReferenceArrayField>
+        </SimpleShowLayout>
+    </Show>
 );
