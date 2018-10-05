@@ -45,7 +45,7 @@ const SmallImageField = ( { record } ) =>
 		(
 			<span>
 				<Image publicId={record.image.public_id} secure="true">
-					<Transformation height="200" crop="fill"/>
+					<Transformation width="400" crop="fill"/>
 					<Transformation fetchFormat="auto" quality="80"/>
 				</Image>
 			</span>
@@ -175,7 +175,9 @@ export const WorksList = (props) => (
 		          source="locations"
 		          label="Lagerort"
 		        >
-		          	<LocationField source="name" />
+			    	<SingleFieldList>
+		          		<LocationField source="name" />
+		          	</SingleFieldList>
 	        </ReferenceArrayField>			
 		    <ReferenceArrayField
 			    label="Notizen"
@@ -239,7 +241,9 @@ export const WorksEdit = (props) => (
 			          source="locations"
 			          label="Lagerort"
 			        >
-			          	<LocationInput source="name" />
+			          	<SingleFieldList>
+		          			<LocationInput source="name" />
+		          		</SingleFieldList>
 		        </ReferenceArrayField>
 		        <WorkLocationAdd />	
 		    </FormTab>

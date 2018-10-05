@@ -46,7 +46,7 @@ class WorkLocationAdd extends Component {
 	render()  {
 		const { record } = this.props;
 		const { saveLocationToWork, onTextChange } = this;
-		if(record.locations.length && record.locations.length > 0) {
+		if(record.locations && record.locations.length && record.locations.length > 0) {
 			return null
 		}
 		return (
