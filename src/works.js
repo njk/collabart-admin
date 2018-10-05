@@ -1,5 +1,5 @@
 import React from 'react';
-import { Show, SimpleShowLayout, FormTab, TabbedForm, List, Edit, Create, Datagrid, ReferenceField, ArrayField, TextField, RichTextField, DateField, ReferenceArrayField, SingleFieldList, ShowButton, EditButton, SimpleForm, SelectInput, ReferenceInput, AutocompleteInput, TextInput, NumberInput, BooleanInput, DateInput, ReferenceArrayInput, SelectArrayInput, Filter } from 'react-admin';
+import { Show, SimpleShowLayout, FormTab, TabbedForm, AutocompleteArrayInput, List, Edit, Create, Datagrid, ReferenceField, ArrayField, TextField, RichTextField, DateField, ReferenceArrayField, SingleFieldList, ShowButton, EditButton, SimpleForm, SearchInput, SelectInput, ReferenceInput, AutocompleteInput, TextInput, NumberInput, BooleanInput, DateInput, ReferenceArrayInput, SelectArrayInput, Filter } from 'react-admin';
 import CloudinaryUpload from './CloudinaryUpload';
 import CloudinaryWorkImage from './CloudinaryWorkImage';
 import { Image, Transformation } from 'cloudinary-react';
@@ -11,20 +11,7 @@ import WorkLocationAdd from './WorkLocationAdd'
 
 const WorksFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="Titel" source="title" />
-        <ReferenceInput 
-        	source="notes" 
-        	reference="notes" 
-        	label="Notizen"
-        	perPage={10} 
-        	sort={{ field: 'note', order: 'ASC' }}
-        	filterToQuery={searchText => ({ 'note': searchText })} >
-            <AutocompleteInput
-                optionText={choice =>
-                    `${choice.note}`
-                }
-            />
-        </ReferenceInput> 
+        <TextInput label="Titel" source="title" alwaysOn />        
         <ReferenceInput 
         	source="artists" 
         	reference="artists" 
@@ -38,7 +25,8 @@ const WorksFilter = (props) => (
                     `${choice.name.first} ${choice.name.last}`
                 }
             />
-        </ReferenceInput>        
+        </ReferenceInput>
+        <TextInput label='Notizen' source='notes_search' alwaysOn />
     </Filter>
 );
 
@@ -126,7 +114,7 @@ const LocationField = ( { record }) =>
 				{record.name}
 			</span>
 		)
-		: 'kein Ort'
+		: null
 }
 
 const CloudinaryInput = ({record}) => {
@@ -182,13 +170,13 @@ export const WorksList = (props) => (
 			    </SingleFieldList>
 			</ReferenceArrayField>
 			<DateField label="Jahr" source="publishedDate" options={{ year: 'numeric' }}/>
-			<ReferenceField
+			<ReferenceArrayField
 		          reference="locations"
 		          source="locations"
 		          label="Lagerort"
 		        >
 		          	<LocationField source="name" />
-		        </ReferenceField>			
+	        </ReferenceArrayField>			
 		    <ReferenceArrayField
 			    label="Notizen"
 			    reference="notes"
@@ -223,26 +211,36 @@ export const WorksEdit = (props) => (
 	<Edit {...props} title={<WorksTitle />}>
 		<TabbedForm>
 			<FormTab label="Hauptinformationen">
+				<SmallImageField source="image" label="Abbildung" />
 				<TextInput source="title" />
-				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'}>
-					<SelectArrayInput optionText={artistInputRenderer} />
+				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
+		        	sort={{ field: 'name.last', order: 'ASC' }}
+		        	filterToQuery={searchText => ({ 'name.last': searchText })}>
+					<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} />
 				</ReferenceArrayInput>
 				<DimensionsInput />
-				<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'}>
-					<SelectArrayInput optionText={techniquesInputRenderer} />
+				<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} sort={{ field: 'name', order: 'ASC' }}>
+					<AutocompleteArrayInput optionText={techniquesInputRenderer} />
 				</ReferenceArrayInput>
-				<DateInput source="publishedDate" label="Jahr"/>
-            <SmallImageField source="image" label="Abbildung" />				
+				<NumberInput source="publishedDate" 
+					format={v => {
+						const date = new Date(v);
+						return date.getFullYear();
+					}} 
+					parse={v => {
+						const date = new Date().setFullYear(v);
+						return date;
+					}} label="Jahr" />
 				<WorkImageCloudinaryInput />
 		    </FormTab>
 		    <FormTab label="Lagerinformationen" path="store">
-	    		<ReferenceField
+	    		<ReferenceArrayField
 			          reference="locations"
 			          source="locations"
 			          label="Lagerort"
 			        >
 			          	<LocationInput source="name" />
-		        </ReferenceField>
+		        </ReferenceArrayField>
 		        <WorkLocationAdd />	
 		    </FormTab>
 		    <FormTab label="Notizen" path="notes">
