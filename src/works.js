@@ -221,7 +221,9 @@ export const WorksEdit = (props) => (
 					<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} />
 				</ReferenceArrayInput>
 				<DimensionsInput />
-				<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} sort={{ field: 'name', order: 'ASC' }}>
+				<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} perPage={10}
+					sort={{ field: 'name', order: 'ASC' }}
+					filterToQuery={searchText => ({ 'name': searchText })}>
 					<AutocompleteArrayInput optionText={techniquesInputRenderer} />
 				</ReferenceArrayInput>
 				<NumberInput source="publishedDate" 
@@ -287,10 +289,27 @@ export const WorksEdit = (props) => (
 export const WorksCreate = (props) => (
     <Create {...props}>
         <SimpleForm>
-            <TextInput source="title" />
-			<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'}>
-				<SelectArrayInput optionText={artistInputRenderer} />
-			</ReferenceArrayInput>                
+			<TextInput source="title" />
+			<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
+	        	sort={{ field: 'name.last', order: 'ASC' }}
+	        	filterToQuery={searchText => ({ 'name.last': searchText })}>
+				<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} />
+			</ReferenceArrayInput>
+			<DimensionsInput />
+			<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} perPage={10}
+				sort={{ field: 'name', order: 'ASC' }}
+				filterToQuery={searchText => ({ 'name': searchText })}>
+				<AutocompleteArrayInput optionText={techniquesInputRenderer} />
+			</ReferenceArrayInput>
+			<NumberInput source="publishedDate" 
+				format={v => {
+					const date = new Date(v);
+					return date.getFullYear();
+				}} 
+				parse={v => {
+					const date = new Date().setFullYear(v);
+					return date;
+				}} label="Jahr" />
         </SimpleForm>
     </Create>
 );
