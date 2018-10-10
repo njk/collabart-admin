@@ -8,6 +8,8 @@ import { EditLocationButton } from './LocationButtons';
 import { EditNoteButton } from './NoteButtons';
 import WorkNoteAdd from './WorkNoteAdd'
 import WorkLocationAdd from './WorkLocationAdd'
+import FilterIcon from '@material-ui/icons/Filter';
+
 
 const WorksFilter = (props) => (
     <Filter {...props}>
@@ -56,7 +58,7 @@ const ImagesField = ( { record } ) =>
 	? 
 		(
 			<span>
-				&#8226;
+				<FilterIcon />
 			</span>
 		)
 	: (<span></span>);	
@@ -187,14 +189,7 @@ export const WorksList = (props) => (
 			        <RichTextField source="note" /> 
 			    </SingleFieldList>
 			</ReferenceArrayField>
-			<ArrayField
-			    label="Bilder"
-			    source="images"
-			>
-			    <SingleFieldList>
-			        <ImagesField /> 
-			    </SingleFieldList>
-			</ArrayField>
+			<ImagesField /> 
 			<ShowButton />
             <EditButton />
         </Datagrid>
