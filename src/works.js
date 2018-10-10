@@ -38,13 +38,13 @@ const ReferenceSearchInput = ( { choices } ) =>
 		    )
 	}
 
-const SmallImageField = ( { record } ) => 
+const SmallImageField = ( { record, width } ) => 
 	record && record.image
 	? 
 		(
 			<span>
 				<Image publicId={record.image.public_id} secure="true">
-					<Transformation width="400" crop="fill"/>
+					<Transformation width={width} crop="fill"/>
 					<Transformation fetchFormat="auto" quality="80"/>
 				</Image>
 			</span>
@@ -147,7 +147,7 @@ const SharingInputs = ({ record }) =>
 export const WorksList = (props) => (
     <List {...props} title="Werke" filters={<WorksFilter />} perPage={20}>
         <Datagrid>
-            <SmallImageField source="image" label="Abbildung" />
+            <SmallImageField source="image" label="Abbildung" width="200"/>
 			<ReferenceArrayField
 			    label="Künstler"
 			    reference="artists"
@@ -212,7 +212,7 @@ export const WorksEdit = (props) => (
 	<Edit {...props} title={<WorksTitle />}>
 		<TabbedForm>
 			<FormTab label="Hauptinformationen">
-				<SmallImageField source="image" label="Abbildung" />
+				<SmallImageField source="image" label="Abbildung" width="400"/>
 				<TextInput source="title" />
 				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
 		        	sort={{ field: 'name.last', order: 'ASC' }}
@@ -316,7 +316,7 @@ export const WorksCreate = (props) => (
 export const WorksShow = (props) => (
     <Show {...props} title={<WorksTitle />}>
         <SimpleShowLayout>
-            <SmallImageField source="image" label="Abbildung" />
+            <SmallImageField source="image" label="Abbildung" width="400"/>
             <ReferenceArrayField
 			    label="Künstler"
 			    reference="artists"
