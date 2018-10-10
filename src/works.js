@@ -26,7 +26,6 @@ const WorksFilter = (props) => (
                 }
             />
         </ReferenceInput>
-        <TextInput label='Notizen' source='notes_search' alwaysOn />
     </Filter>
 );
 
