@@ -1,9 +1,9 @@
 import React from 'react';
-import { List, Edit, Create, Datagrid, EditButton, SimpleForm, TextInput, Filter } from 'react-admin';
+import { List, Edit, Create, Datagrid, EditButton, SimpleForm, BooleanInput, TextInput, Filter } from 'react-admin';
 
 const ArtistsFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="Search" source="q" alwaysOn />
+        <TextInput label="Search" source="name.last" alwaysOn />
     </Filter>
 );
 
@@ -18,7 +18,7 @@ const NameTextField = ( { record, ...rest } ) =>
 	: null;
 
 export const ArtistsList = (props) => (
-    <List {...props} title="Künstler" filters={<ArtistsFilter />}>
+    <List {...props} title="Künstler" filters={<ArtistsFilter />} filter={{ in_collection: true }}>
         <Datagrid>    
             <NameTextField source="name" title="Name" />            
             <EditButton />
