@@ -118,6 +118,32 @@ const LocationField = ( { record }) =>
 		: null
 }
 
+
+
+const YearField = ({ record }) => 
+	{
+		if(record.isDateUnknown) {
+			return <span>unbekannt</span>
+		}
+		if(record.isDateNotExact) {
+			return <span>ca. {new Date(record.publishedDate).getFullYear()}</span>
+		}
+		if(record.publishedDateAlternative) {
+			return <span>
+					{new Date(record.publishedDate).getFullYear()}
+					{record.dateDivider}
+					{new Date(record.publishedDateAlternative).getFullYear()}
+				</span>
+		}
+		if(record.publishedDate){
+			return <span>
+				{new Date(record.publishedDate).getFullYear()}
+				</span>
+		}
+		return <span>
+				</span>
+	}
+
 const CloudinaryInput = ({record}) => {
 
 	return (<CloudinaryUpload record={record}/>)
@@ -170,7 +196,7 @@ export const WorksList = (props) => (
 			        <TextField source="name" /> 
 			    </SingleFieldList>
 			</ReferenceArrayField>
-			<DateField label="Jahr" source="publishedDate" options={{ year: 'numeric' }}/>
+			<YearField label="Jahr" />
 			<ReferenceArrayField
 		          reference="locations"
 		          source="locations"
@@ -222,13 +248,33 @@ export const WorksEdit = (props) => (
 				</ReferenceArrayInput>
 				<NumberInput source="publishedDate" 
 					format={v => {
+						if(v){
+							const date = new Date(v);
+							return date.getFullYear();
+						} else {
+							return null
+						}
+					}} 
+					parse={v => {
+						if(v){
+							const date = new Date().setFullYear(v);
+							return date;
+						} else {
+							return null
+						}
+					}} label="Jahr" />
+				<NumberInput source="publishedDateAlternative" 
+					format={v => {
 						const date = new Date(v);
 						return date.getFullYear();
 					}} 
 					parse={v => {
 						const date = new Date().setFullYear(v);
 						return date;
-					}} label="Jahr" />
+					}} label="alternatives Jahr" />
+				<TextInput source="dateDivider" label="Trennzeichen" />
+				<BooleanInput source="isDateNotExact" label="ungenaue Jahresangabe"/>
+				<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
 				<WorkImageCloudinaryInput />
 		    </FormTab>
 		    <FormTab label="Lagerinformationen" path="store">
