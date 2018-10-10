@@ -8,6 +8,8 @@ import { EditLocationButton } from './LocationButtons';
 import { EditNoteButton } from './NoteButtons';
 import WorkNoteAdd from './WorkNoteAdd'
 import WorkLocationAdd from './WorkLocationAdd'
+import FilterIcon from '@material-ui/icons/Filter';
+
 
 const WorksFilter = (props) => (
     <Filter {...props}>
@@ -26,7 +28,6 @@ const WorksFilter = (props) => (
                 }
             />
         </ReferenceInput>
-        <TextInput label='Notizen' source='notes_search' alwaysOn />
     </Filter>
 );
 
@@ -39,13 +40,13 @@ const ReferenceSearchInput = ( { choices } ) =>
 		    )
 	}
 
-const SmallImageField = ( { record } ) => 
+const SmallImageField = ( { record, width } ) => 
 	record && record.image
 	? 
 		(
 			<span>
 				<Image publicId={record.image.public_id} secure="true">
-					<Transformation width="400" crop="fill"/>
+					<Transformation width={width} crop="fill"/>
 					<Transformation fetchFormat="auto" quality="80"/>
 				</Image>
 			</span>
@@ -57,7 +58,7 @@ const ImagesField = ( { record } ) =>
 	? 
 		(
 			<span>
-				&#8226;
+				<FilterIcon />
 			</span>
 		)
 	: (<span></span>);	
@@ -117,6 +118,32 @@ const LocationField = ( { record }) =>
 		: null
 }
 
+
+
+const YearField = ({ record }) => 
+	{
+		if(record.isDateUnknown) {
+			return <span>unbekannt</span>
+		}
+		if(record.isDateNotExact) {
+			return <span>ca. {new Date(record.publishedDate).getFullYear()}</span>
+		}
+		if(record.publishedDateAlternative) {
+			return <span>
+					{new Date(record.publishedDate).getFullYear()}
+					{record.dateDivider}
+					{new Date(record.publishedDateAlternative).getFullYear()}
+				</span>
+		}
+		if(record.publishedDate){
+			return <span>
+				{new Date(record.publishedDate).getFullYear()}
+				</span>
+		}
+		return <span>
+				</span>
+	}
+
 const CloudinaryInput = ({record}) => {
 
 	return (<CloudinaryUpload record={record}/>)
@@ -148,7 +175,7 @@ const SharingInputs = ({ record }) =>
 export const WorksList = (props) => (
     <List {...props} title="Werke" filters={<WorksFilter />} perPage={20}>
         <Datagrid>
-            <SmallImageField source="image" label="Abbildung" />
+            <SmallImageField source="image" label="Abbildung" width="200"/>
 			<ReferenceArrayField
 			    label="Künstler"
 			    reference="artists"
@@ -169,7 +196,7 @@ export const WorksList = (props) => (
 			        <TextField source="name" /> 
 			    </SingleFieldList>
 			</ReferenceArrayField>
-			<DateField label="Jahr" source="publishedDate" options={{ year: 'numeric' }}/>
+			<YearField label="Jahr" />
 			<ReferenceArrayField
 		          reference="locations"
 		          source="locations"
@@ -188,14 +215,7 @@ export const WorksList = (props) => (
 			        <RichTextField source="note" /> 
 			    </SingleFieldList>
 			</ReferenceArrayField>
-			<ArrayField
-			    label="Bilder"
-			    source="images"
-			>
-			    <SingleFieldList>
-			        <ImagesField /> 
-			    </SingleFieldList>
-			</ArrayField>
+			<ImagesField /> 
 			<ShowButton />
             <EditButton />
         </Datagrid>
@@ -213,7 +233,7 @@ export const WorksEdit = (props) => (
 	<Edit {...props} title={<WorksTitle />}>
 		<TabbedForm>
 			<FormTab label="Hauptinformationen">
-				<SmallImageField source="image" label="Abbildung" />
+				<SmallImageField source="image" label="Abbildung" width="400"/>
 				<TextInput source="title" />
 				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
 		        	sort={{ field: 'name.last', order: 'ASC' }}
@@ -228,13 +248,33 @@ export const WorksEdit = (props) => (
 				</ReferenceArrayInput>
 				<NumberInput source="publishedDate" 
 					format={v => {
+						if(v){
+							const date = new Date(v);
+							return date.getFullYear();
+						} else {
+							return null
+						}
+					}} 
+					parse={v => {
+						if(v){
+							const date = new Date().setFullYear(v);
+							return date;
+						} else {
+							return null
+						}
+					}} label="Jahr" />
+				<NumberInput source="publishedDateAlternative" 
+					format={v => {
 						const date = new Date(v);
 						return date.getFullYear();
 					}} 
 					parse={v => {
 						const date = new Date().setFullYear(v);
 						return date;
-					}} label="Jahr" />
+					}} label="alternatives Jahr" />
+				<TextInput source="dateDivider" label="Trennzeichen" />
+				<BooleanInput source="isDateNotExact" label="ungenaue Jahresangabe"/>
+				<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
 				<WorkImageCloudinaryInput />
 		    </FormTab>
 		    <FormTab label="Lagerinformationen" path="store">
@@ -317,7 +357,7 @@ export const WorksCreate = (props) => (
 export const WorksShow = (props) => (
     <Show {...props} title={<WorksTitle />}>
         <SimpleShowLayout>
-            <SmallImageField source="image" label="Abbildung" />
+            <SmallImageField source="image" label="Abbildung" width="400"/>
             <ReferenceArrayField
 			    label="Künstler"
 			    reference="artists"
