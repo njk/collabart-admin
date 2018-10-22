@@ -54,7 +54,7 @@ const SmallImageField = ( { record, width } ) =>
 	: null;
 
 const ImagesField = ( { record } ) => 
-	record && record.images
+	record && record.images && record.images.length > 1
 	? 
 		(
 			<span>
