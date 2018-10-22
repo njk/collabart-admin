@@ -65,10 +65,16 @@ const ImagesField = ( { record } ) =>
 
 const DimensionsField = ( { record } ) => 
 	{
-		return record && record.dimensions ? (
-			<span>{record.dimensions.height}x{record.dimensions.width} cm</span>
-		    )
-		    : null
+		if(record && record.dimensions){
+			if(record.dimensions.diameter) {
+				return <span>&oslash; {record.dimensions.diameter} cm</span>
+			}
+			if(record.dimensions.depth) {
+				return <span>{record.dimensions.height}x{record.dimensions.width}x{record.dimensions.depth} cm</span>
+			}
+			return <span>{record.dimensions.height}x{record.dimensions.width} cm</span>
+		}
+		return null;
 	}
 
 const DimensionsInput = ( { record } ) => 
@@ -78,6 +84,7 @@ const DimensionsInput = ( { record } ) =>
 				<NumberInput source="dimensions.height" label="Höhe" />
 				<NumberInput source="dimensions.width" label="Breite" />
 				<NumberInput source="dimensions.depth" label="Tiefe" />
+				<NumberInput source="dimensions.diameter" label="Durchmesser" />
 			</span>
 		    )
 	}
