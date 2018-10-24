@@ -1,13 +1,40 @@
 import React from 'react';
-import { Show, SimpleShowLayout, FormTab, TabbedForm, AutocompleteArrayInput, List, Edit, Create, Datagrid, ReferenceField, ArrayField, TextField, RichTextField, DateField, ReferenceArrayField, SingleFieldList, ShowButton, EditButton, SimpleForm, SearchInput, SelectInput, ReferenceInput, AutocompleteInput, TextInput, NumberInput, BooleanInput, DateInput, ReferenceArrayInput, SelectArrayInput, Filter } from 'react-admin';
-import CloudinaryUpload from './CloudinaryUpload';
+import {
+	Show,
+	SimpleShowLayout,
+	Responsive,
+	SimpleList,
+	FormTab,
+	TabbedForm,
+	Toolbar,
+	SaveButton,
+	AutocompleteArrayInput,
+	DisabledInput,
+	List,
+	Edit,
+	Create,
+	Datagrid,
+	TextField,
+	RichTextField,
+	ReferenceArrayField,
+	SingleFieldList,
+	ShowButton,
+	EditButton,
+	SimpleForm,
+	ReferenceInput,
+	AutocompleteInput,
+	TextInput,
+	NumberInput,
+	BooleanInput,
+	ReferenceArrayInput,
+	Filter
+	}
+	from 'react-admin';
 import CloudinaryWorkImage from './CloudinaryWorkImage';
 import { Image, Transformation } from 'cloudinary-react';
-import EditImageButton from './EditImageButton';
-import { EditLocationButton } from './LocationButtons';
-import { EditNoteButton } from './NoteButtons';
-import WorkNoteAdd from './WorkNoteAdd'
-import WorkLocationAdd from './WorkLocationAdd'
+import { EditImageButton, CreateImageButton } from './ImageButtons';
+import {  CreateLocationButton } from './LocationButtons';
+import { EditNoteButton, CreateNoteButton } from './NoteButtons';
 import FilterIcon from '@material-ui/icons/Filter';
 
 
@@ -30,15 +57,6 @@ const WorksFilter = (props) => (
         </ReferenceInput>
     </Filter>
 );
-
-const ReferenceSearchInput = ( { choices } ) => 
-	{
-		return (
-			<span>
-				<TextInput />
-			</span>
-		    )
-	}
 
 const SmallImageField = ( { record, width } ) => 
 	record && record.image
@@ -101,16 +119,12 @@ const NameField = ( { record }) =>
 		: null
 }
 
-const LocationInput = ( { record }) => 
+const LocationButtonAdd = ( { record }) => 
 {
-	return record && record.name
+	return record && record.locations && record.locations.length
 		?
-		(
-			<span>
-				{record.name}<br/>ändern
-			</span>
-		)
-		: 'kein Ort'
+		<p>zum Ändern klicken</p>
+		: <CreateLocationButton record={record}/>
 }
 
 const LocationField = ( { record }) => 
@@ -125,35 +139,41 @@ const LocationField = ( { record }) =>
 		: null
 }
 
+const ImageInformation = ( { record } ) => {
+	return record && record.image
+		?
+		(
+			<span>
+				<p>Auflösung</p>
+				<p>{record.image.height}x{record.image.width}</p>
+				<p>Format: {record.image.format}</p>
+				<p>Oringinal</p>
+				<p>Komprimiert</p>
+			</span>
+		)
+		: null
+}
 
-
-const YearField = ({ record }) => 
-	{
-		if(record.isDateUnknown) {
-			return <span>unbekannt</span>
-		}
-		if(record.isDateNotExact) {
-			return <span>ca. {new Date(record.publishedDate).getFullYear()}</span>
-		}
-		if(record.publishedDateAlternative) {
-			return <span>
-					{new Date(record.publishedDate).getFullYear()}
-					{record.dateDivider}
-					{new Date(record.publishedDateAlternative).getFullYear()}
-				</span>
-		}
-		if(record.publishedDate){
-			return <span>
-				{new Date(record.publishedDate).getFullYear()}
-				</span>
-		}
-		return <span>
-				</span>
+const YearField = ({ record }) => {
+	if(record.isDateUnknown) {
+		return <span>unbekannt</span>
 	}
-
-const CloudinaryInput = ({record}) => {
-
-	return (<CloudinaryUpload record={record}/>)
+	if(record.isDateNotExact) {
+		return <span>ca. {new Date(record.publishedDate).getFullYear()}</span>
+	}
+	if(record.publishedDateAlternative) {
+		return <span>
+				{new Date(record.publishedDate).getFullYear()}
+				{record.dateDivider}
+				{new Date(record.publishedDateAlternative).getFullYear()}
+			</span>
+	}
+	if(record.publishedDate){
+		return <span>
+			{new Date(record.publishedDate).getFullYear()}
+			</span>
+	}
+	return <span></span>
 }
 
 const WorkImageCloudinaryInput = ({record}) => {
@@ -179,54 +199,86 @@ const SharingInputs = ({ record }) =>
 		</span>
 	)
 
-export const WorksList = (props) => (
-    <List {...props} title="Werke" filters={<WorksFilter />} perPage={20}>
-        <Datagrid>
-            <SmallImageField source="image" label="Abbildung" width="200"/>
-			<ReferenceArrayField
-			    label="Künstler"
-			    reference="artists"
-			    source="artists"
-			>
-			    <SingleFieldList>
-			        <NameField />
-			    </SingleFieldList>
-			</ReferenceArrayField>         
-            <TextField source="title" label="Titel" />
-            <DimensionsField label="Maße" source="dimensions"/>
- 			<ReferenceArrayField
-			    label="Techniken"
-			    reference="techniques"
-			    source="techniques"
-			>
-			    <SingleFieldList>
-			        <TextField source="name" /> 
-			    </SingleFieldList>
-			</ReferenceArrayField>
-			<YearField label="Jahr" />
-			<ReferenceArrayField
-		          reference="locations"
-		          source="locations"
-		          label="Lagerort"
-		        >
-			    	<SingleFieldList>
-		          		<LocationField source="name" />
-		          	</SingleFieldList>
-	        </ReferenceArrayField>			
-		    <ReferenceArrayField
-			    label="Notizen"
-			    reference="notes"
-			    source="notes"
-			>
-			    <SingleFieldList>
-			        <RichTextField source="note" /> 
-			    </SingleFieldList>
-			</ReferenceArrayField>
-			<ImagesField /> 
-			<ShowButton />
-            <EditButton />
-        </Datagrid>
-    </List>
+let showNotes = true;
+
+export const WorksList = (props, showNotes) => (
+	<List {...props} title="Werke" filters={<WorksFilter />} perPage={20}>
+
+	<Responsive
+		small={
+                <SimpleList
+                    primaryText={record => record.title}
+                    secondaryText={	record => <ReferenceArrayField
+					    label="Künstler"
+					    reference="artists"
+					    source="artists"
+					    record={record}
+					    basepath="artists"
+					>
+					    <SingleFieldList>
+					        <NameField />
+					    </SingleFieldList>
+					</ReferenceArrayField> 
+					}
+                    tertiaryText={record => <YearField record={record}/>}
+                    leftIcon={record => <SmallImageField record={record} source="image" label="Abbildung" width="200"/>}
+                />
+            }
+        medium={
+		        <Datagrid>
+		            <SmallImageField source="image" label="Abbildung" width="200"/>
+					<ReferenceArrayField
+					    label="Künstler"
+					    reference="artists"
+					    source="artists"
+					>
+					    <SingleFieldList>
+					        <NameField />
+					    </SingleFieldList>
+					</ReferenceArrayField>         
+					<TextField source="title" label="Titel" />
+					<DimensionsField label="Maße" source="dimensions"/>
+		 			<ReferenceArrayField
+					    label="Techniken"
+					    reference="techniques"
+					    source="techniques"
+					>
+					    <SingleFieldList>
+					        <TextField source="name" /> 
+					    </SingleFieldList>
+					</ReferenceArrayField>
+					<YearField label="Jahr" />
+					<ReferenceArrayField
+				          reference="locations"
+				          source="locations"
+				          label="Lagerort"
+				        >
+					    	<SingleFieldList>
+				          		<LocationField source="name" />
+				          	</SingleFieldList>
+			        </ReferenceArrayField>
+			        { showNotes ?
+			        	<ReferenceArrayField
+					    label="Notizen"
+					    reference="notes"
+					    source="notes"
+					    sortable={false}
+					>
+					    <SingleFieldList>
+					        <RichTextField source="note" /> 
+					    </SingleFieldList>
+					</ReferenceArrayField>
+					: <span>Hallo</span>
+			        }			
+				    
+					<ImagesField label="Abbildungen" sortable={false}/> 
+					<ShowButton />
+		            <EditButton />
+		        </Datagrid>
+        }
+        />
+		    </List>
+
 );
 
 const WorksTitle = ({ record }) => {
@@ -236,15 +288,33 @@ const WorksTitle = ({ record }) => {
 const artistInputRenderer = choice => `${choice.name.first} ${choice.name.last}`;
 const techniquesInputRenderer = choice => `${choice.name}`;
 
+const WorksEditToolbar = props => (
+    <Toolbar {...props} >
+    	<SaveButton
+            label="Speichern"
+            redirect={false}
+            submitOnEnter={true}
+        />
+		<SaveButton
+            label="Speichern und zur Liste"
+            redirect="list"
+            submitOnEnter={false}
+            variant="flat"
+        />
+    </Toolbar>
+);
+
+
 export const WorksEdit = (props) => (
 	<Edit {...props} title={<WorksTitle />}>
-		<TabbedForm>
-			<FormTab label="Hauptinformationen">
+		<TabbedForm toolbar={<WorksEditToolbar />}>
+			<FormTab label="Hauptinformationen" >
 				<SmallImageField source="image" label="Abbildung" width="400"/>
+				<WorkImageCloudinaryInput />
 				<TextInput source="title" />
 				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
-		        	sort={{ field: 'name.last', order: 'ASC' }}
-		        	filterToQuery={searchText => ({ 'name.last': searchText })}>
+					sort={{ field: 'name.last', order: 'ASC' }}
+					filterToQuery={searchText => ({ 'name.last': searchText })}>
 					<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} />
 				</ReferenceArrayInput>
 				<DimensionsInput />
@@ -259,7 +329,7 @@ export const WorksEdit = (props) => (
 							const date = new Date(v);
 							return date.getFullYear();
 						} else {
-							return null
+							return ''
 						}
 					}} 
 					parse={v => {
@@ -267,36 +337,49 @@ export const WorksEdit = (props) => (
 							const date = new Date().setFullYear(v);
 							return date;
 						} else {
-							return null
+							return ''
 						}
 					}} label="Jahr" />
 				<NumberInput source="publishedDateAlternative" 
 					format={v => {
-						const date = new Date(v);
-						return date.getFullYear();
+						if(v){
+							const date = new Date(v);
+							return date.getFullYear();
+						} else {
+							return ''
+						}
 					}} 
 					parse={v => {
-						const date = new Date().setFullYear(v);
-						return date;
+						if(v){
+							const date = new Date().setFullYear(v);
+							return date;
+						} else {
+							return ''
+						}
 					}} label="alternatives Jahr" />
 				<TextInput source="dateDivider" label="Trennzeichen" />
 				<BooleanInput source="isDateNotExact" label="ungenaue Jahresangabe"/>
 				<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
-				<WorkImageCloudinaryInput />
+				
 		    </FormTab>
-		    <FormTab label="Lagerinformationen" path="store">
+		    <FormTab label="Lagerinformationen" path="locations">
+		    	
 	    		<ReferenceArrayField
 			          reference="locations"
 			          source="locations"
 			          label="Lagerort"
+			          sort={{ field: 'created_at', order: 'DESC' }}			          
 			        >
 			          	<SingleFieldList>
-		          			<LocationInput source="name" />
+		          			<TextField source="name" />
 		          		</SingleFieldList>
 		        </ReferenceArrayField>
-		        <WorkLocationAdd />	
+		        <LocationButtonAdd />		    		        
+		        <DisabledInput source="locations" className="no-display"/>		        
 		    </FormTab>
 		    <FormTab label="Notizen" path="notes">
+		    	
+		    	<CreateNoteButton />
 	    		<ReferenceArrayField
 			          reference="notes"
 			          source="notes"
@@ -308,9 +391,11 @@ export const WorksEdit = (props) => (
 						<EditNoteButton />
 			          </Datagrid>
 		        </ReferenceArrayField>
-		        <WorkNoteAdd />		        
+		        <DisabledInput source="notes" className="no-display"/>
 		    </FormTab>
 		    <FormTab label="Bilder" path="images">
+		    	
+		    	<CreateImageButton />
 				 <ReferenceArrayField
 			          reference="images"
 			          source="images"
@@ -324,7 +409,7 @@ export const WorksEdit = (props) => (
 						<EditImageButton/>		            
 			          </Datagrid>
 		        </ReferenceArrayField>
-				<CloudinaryInput source='images' reference='images'/>
+		        <DisabledInput source="images" className="no-display"/>
 		    </FormTab>
 			<FormTab label="Freigaben" path="sharing">
 	    		<SharingInputs /> 
@@ -365,6 +450,7 @@ export const WorksShow = (props) => (
     <Show {...props} title={<WorksTitle />}>
         <SimpleShowLayout>
             <SmallImageField source="image" label="Abbildung" width="400"/>
+            <ImageInformation source="image" />
             <ReferenceArrayField
 			    label="Künstler"
 			    reference="artists"
@@ -385,7 +471,7 @@ export const WorksShow = (props) => (
 			        <TextField source="name" /> 
 			    </SingleFieldList>
 			</ReferenceArrayField>
-			<DateField label="Jahr" source="publishedDate" options={{ year: 'numeric' }}/>
+			<YearField label="Jahr" />
 			<ReferenceArrayField
 			    label="Notizen"
 			    reference="notes"

@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
-import { showNotification } from 'react-admin';
-import { imageCreate, workImagesUpdate } from './cloudinaryActions';
+import { change } from 'redux-form';
+import { showNotification, REDUX_FORM_NAME } from 'react-admin';
+import { imageCreate } from './cloudinaryActions';
+import { Image, Transformation } from 'cloudinary-react';
 
 
 class CloudinaryUpload extends Component {
@@ -42,23 +44,22 @@ class CloudinaryUpload extends Component {
 	  		data.total: ${e.total}`);
 	  }.bind(this));
 
-	  xhr.onreadystatechange = function(e) {
-	  	if (xhr.readyState == 4 && xhr.status == 200) {
-	      // File uploaded successfully
-	      var response = JSON.parse(xhr.responseText);
-	      //put to database
-	      this.putImageToDatabase(response);
-	      this.state.uploadedPhotos.push(response);
-	      this.setState({
-	      	uploadedPhotos: this.state.uploadedPhotos
-	      });
-	  }
-	}.bind(this);
-
+		  xhr.onreadystatechange = function(e) {
+		  	if (xhr.readyState === 4 && xhr.status === 200) {
+		      // File uploaded successfully
+		      var response = JSON.parse(xhr.responseText);
+		      //put to database
+		      this.putImageToDatabase(response);
+		      this.state.uploadedPhotos.push(response);
+		      this.setState({
+		      	uploadedPhotos: this.state.uploadedPhotos
+		      });
+		  }
+		}.bind(this);
 		fd.append('upload_preset', this.context.uploadPreset);
 		fd.append('tags', 'browser_upload'); // Optional - add tag for image admin in Cloudinary
 		fd.append('file', file);
-		xhr.send(fd);
+		xhr.send(fd);		
 	}    
 
 	// ************************ Drag and drop ***************** //
@@ -93,15 +94,14 @@ class CloudinaryUpload extends Component {
 		const { imageCreate } = this.props;
 		console.log("creating image");
 		imageCreate(image, (payload, requestPayload) => {
-			const { record, workImagesUpdate } = this.props;
+			const { record, change, fieldName } = this.props;
 			var images = record.images;
 			if(images && images.length) {
 				images.push(payload.data.id);
 			} else {
 				images = [payload.data.id];
 			}
-			record.images = images;
-			workImagesUpdate(record.id, record);
+			change(REDUX_FORM_NAME, fieldName, images);
 		});
 	}
 
@@ -130,6 +130,18 @@ class CloudinaryUpload extends Component {
 				<div className="progress-bar" ref={this.progressBar} >
 					<div className="progress" ref={this.progressElement} ></div>
 				</div>
+				<div className="uploaded-images">
+					{this.state.uploadedPhotos.map(image => {
+						return (
+							<span key={image.public_id}>
+								<Image publicId={image.public_id} secure="true">
+									<Transformation width="200" crop="fill"/>
+									<Transformation fetchFormat="auto" quality="80"/>
+								</Image>
+							</span>
+						)
+					})}
+				</div>
 			</div>
 			);
 		}
@@ -140,7 +152,7 @@ CloudinaryUpload.propTypes = {
     record: PropTypes.object,
     showNotification: PropTypes.func,
     imageCreate: PropTypes.func,
-    workImagesUpdate: PropTypes.func
+    change: PropTypes.func
 };
 
 CloudinaryUpload.contextTypes = {
@@ -157,5 +169,5 @@ export default connect(null, {
 	showNotification,
 	push,
 	imageCreate,
-	workImagesUpdate
+	change
 })(CloudinaryUpload);

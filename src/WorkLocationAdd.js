@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import AddIcon from '@material-ui/icons/Add';
-import { Button } from 'react-admin';
+import { Button, REDUX_FORM_NAME } from 'react-admin';
 import { locationCreate, workLocationsUpdate } from './locationButtonsActions';
-import ReactQuill from 'react-quill'
+import ReactQuill from 'react-quill';
+import { change } from 'redux-form';
 
 class WorkLocationAdd extends Component {
 	constructor(props, context) {
@@ -29,8 +30,7 @@ class WorkLocationAdd extends Component {
 			} else {
 				locations = [payload.data.id];
 			}
-			record.locations = locations;
-			workLocationsUpdate(record.id, record);
+			change(REDUX_FORM_NAME, 'locations', locations);
 			this.setState({
 				name: ''
 			})
@@ -68,7 +68,8 @@ class WorkLocationAdd extends Component {
 
 WorkLocationAdd.propTypes = {
 	locationCreate: PropTypes.func,
-	workLocationsUpdate: PropTypes.func
+	workLocationsUpdate: PropTypes.func,
+	change: PropTypes.func
 }
 
 Object.assign(
@@ -77,5 +78,6 @@ Object.assign(
 
 export default connect(null, {
 	locationCreate,
-	workLocationsUpdate
+	workLocationsUpdate,
+	change
 })(WorkLocationAdd);

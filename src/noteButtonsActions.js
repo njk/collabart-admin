@@ -24,7 +24,7 @@ export const noteCreate = (data, callback) => ({
 });
 
 export const WORK_NOTES_UPDATE = 'WORK_NOTES_UPDATE';
-export const workNotesUpdate = (id, work) => ({
+export const workNotesUpdate = (id, work, callback) => ({
     type: WORK_NOTES_UPDATE,
     payload: { id, data: { ...work } },
     meta: { 
@@ -34,7 +34,8 @@ export const workNotesUpdate = (id, work) => ({
     		notification: {
     	    		body: 'Notiz wurde dem Werk zugeordnet.',
     	    		level: 'info'
-    	    }
+    	    },
+            callback:  ({ payload, requestPayload }) => { callback(payload, requestPayload) }
     	},
     	onFailure: {
     		notification: {
