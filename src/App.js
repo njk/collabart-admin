@@ -30,7 +30,7 @@ const App = () => (
           <Resource name="works" options={{ label: 'Werke' }} show={WorksShow} list={WorksList} edit={WorksEdit} create={WorksCreate} />   
           <Resource name="artists" options={{ label: 'Künstler' }} list={ArtistsList} edit={ArtistsEdit} create={ArtistsCreate} />
           <Resource name="techniques" options={{ label: 'Techniken' }} list={TechniquesList} edit={TechniquesEdit} create={TechniquesCreate} />
-          <Resource name="locations" edit={LocationsEdit}/>          
+          <Resource name="locations" edit={LocationsEdit} />          
           <Resource name="images" edit={ImagesEdit} />
           <Resource name="notes" edit={NotesEdit} />
       </Admin>
