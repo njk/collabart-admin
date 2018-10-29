@@ -2,8 +2,10 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
-import { showNotification } from 'react-admin';
+import { change } from 'redux-form';
+import { showNotification, REDUX_FORM_NAME } from 'react-admin';
 import { workImageUpdate } from './cloudinaryActions';
+import { Image, Transformation } from 'cloudinary-react';
 
 
 class CloudinaryWorkImage extends Component {
@@ -43,11 +45,11 @@ class CloudinaryWorkImage extends Component {
 	  }.bind(this));
 
 	  xhr.onreadystatechange = function(e) {
-	  	if (xhr.readyState == 4 && xhr.status == 200) {
+	  	if (xhr.readyState === 4 && xhr.status === 200) {
 	      // File uploaded successfully
 	      var response = JSON.parse(xhr.responseText);
 	      //put to database
-	      this.putImageToDatabase(response);
+	      this.putImageToWork(response);
 	      this.state.uploadedPhotos.push(response);
 	      this.setState({
 	      	uploadedPhotos: this.state.uploadedPhotos
@@ -89,12 +91,9 @@ class CloudinaryWorkImage extends Component {
 		}
 	}
 
-	putImageToDatabase(image) {
-		console.log("creating image");
-		const { record, workImageUpdate } = this.props;
-		var workWithImage = record;
-		workWithImage.image = image;
-		workImageUpdate(record.id, workWithImage);
+	putImageToWork(image) {
+		const { change } = this.props;
+		change(REDUX_FORM_NAME, 'image', image);
 	}
 
 	render() {
@@ -122,6 +121,18 @@ class CloudinaryWorkImage extends Component {
 				<div className="progress-bar" ref={this.progressBar} >
 					<div className="progress" ref={this.progressElement} ></div>
 				</div>
+				<div className="uploaded-images">
+					{this.state.uploadedPhotos.map(image => {
+						return (
+							<span key={image.public_id}>
+								<Image publicId={image.public_id} secure="true">
+									<Transformation width="200" crop="fill"/>
+									<Transformation fetchFormat="auto" quality="80"/>
+								</Image>
+							</span>
+						)
+					})}
+				</div>
 			</div>
 			);
 		}
@@ -131,7 +142,8 @@ CloudinaryWorkImage.propTypes = {
     push: PropTypes.func,
     record: PropTypes.object,
     showNotification: PropTypes.func,
-    workImageUpdate: PropTypes.func
+    workImageUpdate: PropTypes.func,
+    change: PropTypes.func
 };
 
 CloudinaryWorkImage.contextTypes = {
@@ -147,5 +159,6 @@ Object.assign(
 export default connect(null, {
 	showNotification,
 	push,
-	workImageUpdate
+	workImageUpdate,
+	change
 })(CloudinaryWorkImage);

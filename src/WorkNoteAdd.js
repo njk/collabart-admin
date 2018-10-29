@@ -2,27 +2,35 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { change, submit, isSubmitting } from 'redux-form';
 import NoteAddIcon from '@material-ui/icons/NoteAdd';
-import { Button } from 'react-admin';
+import { SimpleForm, Button, SaveButton, fetchEnd, fetchStart } from 'react-admin';
 import { noteCreate, workNotesUpdate } from './noteButtonsActions';
-import ReactQuill from 'react-quill'
+import ReactQuill from 'react-quill';
+import RichTextInput from 'ra-input-rich-text';
 
 class WorkNoteAdd extends Component {
 	constructor(props, context) {
 		super(props, context);
-		this.state = {
-			note: ''
-		}
-		this.onEditorChange = this.onEditorChange.bind(this);
-		this.saveNoteToWork = this.saveNoteToWork.bind(this);
+
+		this.handleSaveClick = this.handleSaveClick.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
 	}
 	componentDidMount() {
 	}
 
-	saveNoteToWork(e) {
-		const { noteCreate } = this.props;
-		noteCreate({note: this.state.note}, (payload, requestPayload) => {
-			const { record, workNotesUpdate } = this.props;
+	handleSaveClick() {
+		const {submit} = this.props;
+
+		submit('note-quick-create');
+	}
+
+	handleSubmit(values) {
+        const { noteCreate, fetchStart, fetchEnd, showNotification } = this.props;
+        console.log(values);
+        fetchStart();
+        noteCreate(values, (payload, requestPayload) => {
+        	const { record, workNotesUpdate } = this.props;
 			var notes = record.notes;
 			if(notes && notes.length) {
 				notes.push(payload.data.id);
@@ -30,42 +38,41 @@ class WorkNoteAdd extends Component {
 				notes = [payload.data.id];
 			}
 			record.notes = notes;
-			workNotesUpdate(record.id, record);
-			this.setState({
-				note: ''
-			})
-		})
-		e.preventDefault();
-		console.log("clicked")
-	}
-
-	onEditorChange(value) {
-		this.setState({note: value});
+			workNotesUpdate(record.id, record, (payload, requestPayload) => {
+				fetchEnd();
+			});
+			
+        })
 	}
 
 	render()  {
-		const { record } = this.props;
-		const { saveNoteToWork, onEditorChange } = this;
+		const { record, isSubmitting } = this.props;
+		const { onEditorChange, handleSubmit, handleSaveClick } = this;
 		return (
 			<span>
-				<ReactQuill value={this.state.note} onChange={onEditorChange} />
-				<Button
-					variant="raised"
-					component={Link}
-					onClick={saveNoteToWork}
-					to={`/works/${record.id}/notes`}
-					label="Neue Notiz hinzufügen"
-					title="Neue Notiz hinzufügen"
+				<SimpleForm
+					form="note-quick-create"
+					resource="notes"
+					onSubmit={handleSubmit}
+					toolbar={null}
 					>
-					<NoteAddIcon />
-				</Button>
+					<RichTextInput source="note" label="Notiz"/>
+				</SimpleForm>
+				<SaveButton
+                    saving={isSubmitting}
+                    onClick={handleSaveClick}
+                    label="Notiz hinzufügen"
+                />
 			</span>
 	)}
 }
 
 WorkNoteAdd.propTypes = {
 	noteCreate: PropTypes.func,
-	workNotesUpdate: PropTypes.func
+	workNotesUpdate: PropTypes.func,
+	fetchStart: PropTypes.func,
+	fetchEnd: PropTypes.func,
+	submit: PropTypes.func
 }
 
 Object.assign(
@@ -74,5 +81,8 @@ Object.assign(
 
 export default connect(null, {
 	noteCreate,
-	workNotesUpdate
+	workNotesUpdate,
+	fetchStart,
+	fetchEnd,
+	submit
 })(WorkNoteAdd);

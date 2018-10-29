@@ -1,5 +1,5 @@
 import React from 'react';
-import { List, Edit, Create, Datagrid, EditButton, SimpleForm, BooleanInput, TextInput, Filter } from 'react-admin';
+import { List, Edit, Create, Datagrid, EditButton, SimpleForm, TextInput, Filter } from 'react-admin';
 
 const ArtistsFilter = (props) => (
     <Filter {...props}>

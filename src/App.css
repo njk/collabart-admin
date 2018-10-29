@@ -53,3 +53,6 @@
 .file-elem{
   display:none;
 }
+div.no-display, .no-display {
+  display: none;
+}
