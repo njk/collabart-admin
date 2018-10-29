@@ -312,17 +312,17 @@ export const WorksEdit = (props) => (
 			<FormTab label="Hauptinformationen" >
 				<SmallImageField source="image" label="Abbildung" width="400"/>
 				<WorkImageCloudinaryInput />
-				<TextInput source="title" />
+				<TextInput source="title" label="Titel" />
 				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
 					sort={{ field: 'name.last', order: 'ASC' }}
 					filterToQuery={searchText => ({ 'name.last': searchText })}>
-					<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} />
+					<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} allowEmpty/>
 				</ReferenceArrayInput>
 				<DimensionsInput />
 				<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} perPage={10}
 					sort={{ field: 'name', order: 'ASC' }}
 					filterToQuery={searchText => ({ 'name': searchText })}>
-					<AutocompleteArrayInput optionText={techniquesInputRenderer} />
+					<AutocompleteArrayInput optionText={techniquesInputRenderer} allowEmpty/>
 				</ReferenceArrayInput>
 				<NumberInput source="publishedDate" 
 					format={v => {
@@ -361,7 +361,6 @@ export const WorksEdit = (props) => (
 				<TextInput source="dateDivider" label="Trennzeichen" />
 				<BooleanInput source="isDateNotExact" label="ungenaue Jahresangabe"/>
 				<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
-				
 		    </FormTab>
 		    <FormTab label="Lagerinformationen" path="locations">
 	    		<ReferenceArrayField
@@ -420,27 +419,56 @@ export const WorksEdit = (props) => (
 export const WorksCreate = (props) => (
     <Create {...props}>
         <SimpleForm>
-			<TextInput source="title" />
+			<TextInput source="title" label="Titel" />
+
 			<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
-	        	sort={{ field: 'name.last', order: 'ASC' }}
-	        	filterToQuery={searchText => ({ 'name.last': searchText })}>
-				<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} />
+				sort={{ field: 'name.last', order: 'ASC' }}
+				filterToQuery={searchText => ({ 'name.last': searchText })}>
+				<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} allowEmpty />
 			</ReferenceArrayInput>
 			<DimensionsInput />
 			<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} perPage={10}
 				sort={{ field: 'name', order: 'ASC' }}
 				filterToQuery={searchText => ({ 'name': searchText })}>
-				<AutocompleteArrayInput optionText={techniquesInputRenderer} />
+				<AutocompleteArrayInput optionText={techniquesInputRenderer} allowEmpty />
 			</ReferenceArrayInput>
 			<NumberInput source="publishedDate" 
 				format={v => {
-					const date = new Date(v);
-					return date.getFullYear();
+					if(v){
+						const date = new Date(v);
+						return date.getFullYear();
+					} else {
+						return ''
+					}
 				}} 
 				parse={v => {
-					const date = new Date().setFullYear(v);
-					return date;
+					if(v){
+						const date = new Date().setFullYear(v);
+						return date;
+					} else {
+						return ''
+					}
 				}} label="Jahr" />
+			<NumberInput source="publishedDateAlternative" 
+				format={v => {
+					if(v){
+						const date = new Date(v);
+						return date.getFullYear();
+					} else {
+						return ''
+					}
+				}} 
+				parse={v => {
+					if(v){
+						const date = new Date().setFullYear(v);
+						return date;
+					} else {
+						return ''
+					}
+				}} label="alternatives Jahr" />
+			<TextInput source="dateDivider" label="Trennzeichen" />
+			<BooleanInput source="isDateNotExact" label="ungenaue Jahresangabe"/>
+			<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
         </SimpleForm>
     </Create>
 );
