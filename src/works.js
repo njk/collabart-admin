@@ -27,7 +27,8 @@ import {
 	NumberInput,
 	BooleanInput,
 	ReferenceArrayInput,
-	Filter
+	Filter,
+	FormDataConsumer
 	}
 	from 'react-admin';
 import CloudinaryWorkImage from './CloudinaryWorkImage';
@@ -363,19 +364,17 @@ export const WorksEdit = (props) => (
 				
 		    </FormTab>
 		    <FormTab label="Lagerinformationen" path="locations">
-		    	
 	    		<ReferenceArrayField
 			          reference="locations"
 			          source="locations"
 			          label="Lagerort"
-			          sort={{ field: 'created_at', order: 'DESC' }}			          
+			          sort={{ field: 'created_at', order: 'DESC' }}	
 			        >
-			          	<SingleFieldList>
-		          			<TextField source="name" />
-		          		</SingleFieldList>
+			        	<SingleFieldList>
+			          		<TextField source="name" />
+			          	</SingleFieldList>
 		        </ReferenceArrayField>
 		        <LocationButtonAdd />		    		        
-		        <DisabledInput source="locations" className="no-display"/>		        
 		    </FormTab>
 		    <FormTab label="Notizen" path="notes">
 		    	
