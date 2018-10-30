@@ -18,11 +18,12 @@ const messages = {
     'de': germanMessages,
 };
 
+const i18nProvider = locale => messages[locale];
 
 const App = () => (
     <CloudinaryContext cloudName={Config.cloud_name} uploadPreset={Config.upload_preset}>
       <Admin 
-        locale="de" messages={messages}
+        locale="de" i18nProvider={i18nProvider}
         theme={myTheme}
         authProvider={authProvider}
         dataProvider={dataProvider} 
