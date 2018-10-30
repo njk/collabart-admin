@@ -29,6 +29,8 @@ import {
 	ReferenceArrayInput,
 	Filter,
 	FormDataConsumer
+	CardActions, 
+	ListButton,
 	}
 	from 'react-admin';
 import CloudinaryWorkImage from './CloudinaryWorkImage';
@@ -305,9 +307,16 @@ const WorksEditToolbar = props => (
     </Toolbar>
 );
 
+const WorksEditActions = ({ basePath, data, resource }) => (
+    <CardActions>
+        <ShowButton basePath={basePath} record={data} />
+        <ListButton />
+    </CardActions>
+);
 
 export const WorksEdit = (props) => (
 	<Edit {...props} title={<WorksTitle />}>
+	<Edit {...props} title={<WorksTitle />} actions={<WorksEditActions />}>
 		<TabbedForm toolbar={<WorksEditToolbar />}>
 			<FormTab label="Hauptinformationen" >
 				<SmallImageField source="image" label="Abbildung" width="400"/>
