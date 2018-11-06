@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {
 	Show,
 	SimpleShowLayout,
@@ -16,6 +16,7 @@ import {
 	Datagrid,
 	TextField,
 	RichTextField,
+	BooleanField,
 	ReferenceArrayField,
 	SingleFieldList,
 	ShowButton,
@@ -28,9 +29,13 @@ import {
 	BooleanInput,
 	ReferenceArrayInput,
 	Filter,
-	FormDataConsumer
+	FormDataConsumer,
 	CardActions, 
+	CreateButton, 
+	ExportButton, 
+	RefreshButton,
 	ListButton,
+	Button
 	}
 	from 'react-admin';
 import CloudinaryWorkImage from './CloudinaryWorkImage';
@@ -39,6 +44,7 @@ import { EditImageButton, CreateImageButton } from './ImageButtons';
 import {  CreateLocationButton } from './LocationButtons';
 import { EditNoteButton, CreateNoteButton } from './NoteButtons';
 import FilterIcon from '@material-ui/icons/Filter';
+import SightedWorksButton from './SightedWorksButton';
 
 
 const WorksFilter = (props) => (
@@ -202,10 +208,50 @@ const SharingInputs = ({ record }) =>
 		</span>
 	)
 
+const WorksActions = ({
+    bulkActions,
+    basePath,
+    displayedFilters,
+    filters,
+    filterValues,
+    onUnselectItems,
+    resource,
+    selectedIds,
+    showFilter
+}) => (
+    <CardActions>
+        {bulkActions && React.cloneElement(bulkActions, {
+            basePath,
+            filterValues,
+            resource,
+            selectedIds,
+            onUnselectItems,
+        })}
+        {filters && React.cloneElement(filters, {
+            resource,
+            showFilter,
+            displayedFilters,
+            filterValues,
+            context: 'button',
+        }) }
+        <CreateButton basePath={basePath} />
+        <RefreshButton />
+        {/* Add your custom actions */}
+    </CardActions>
+);
+
+const WorksBulkActionButtons = props => (
+    <Fragment>
+        {/* Add the default bulk delete action 
+        <BulkDeleteButton {...props} />*/}
+        <SightedWorksButton {...props}/>
+    </Fragment>
+);
+
 let showNotes = true;
 
 export const WorksList = (props, showNotes) => (
-	<List {...props} title="Werke" filters={<WorksFilter />} perPage={20}>
+	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={<WorksBulkActionButtons />} actions={<WorksActions />} perPage={20}>
 
 	<Responsive
 		small={
@@ -260,6 +306,7 @@ export const WorksList = (props, showNotes) => (
 				          		<LocationField source="name" />
 				          	</SingleFieldList>
 			        </ReferenceArrayField>
+					<BooleanField source="sighted" label="gesichtet"/>
 			        { showNotes ?
 			        	<ReferenceArrayField
 					    label="Notizen"
@@ -315,18 +362,17 @@ const WorksEditActions = ({ basePath, data, resource }) => (
 );
 
 export const WorksEdit = (props) => (
-	<Edit {...props} title={<WorksTitle />}>
 	<Edit {...props} title={<WorksTitle />} actions={<WorksEditActions />}>
 		<TabbedForm toolbar={<WorksEditToolbar />}>
 			<FormTab label="Hauptinformationen" >
 				<SmallImageField source="image" label="Abbildung" width="400"/>
 				<WorkImageCloudinaryInput />
-				<TextInput source="title" label="Titel" />
 				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
 					sort={{ field: 'name.last', order: 'ASC' }}
 					filterToQuery={searchText => ({ 'name.last': searchText })}>
 					<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} allowEmpty/>
 				</ReferenceArrayInput>
+				<TextInput source="title" label="Titel" />				
 				<DimensionsInput />
 				<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} perPage={10}
 					sort={{ field: 'name', order: 'ASC' }}
@@ -372,6 +418,7 @@ export const WorksEdit = (props) => (
 				<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
 		    </FormTab>
 		    <FormTab label="Lagerinformationen" path="locations">
+		    	<BooleanInput source="sighted" label="gesichtet"/>
 	    		<ReferenceArrayField
 			          reference="locations"
 			          source="locations"
@@ -428,13 +475,12 @@ export const WorksEdit = (props) => (
 export const WorksCreate = (props) => (
     <Create {...props}>
         <SimpleForm>
-			<TextInput source="title" label="Titel" />
-
 			<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
 				sort={{ field: 'name.last', order: 'ASC' }}
 				filterToQuery={searchText => ({ 'name.last': searchText })}>
 				<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} allowEmpty />
 			</ReferenceArrayInput>
+			<TextInput source="title" label="Titel" />			
 			<DimensionsInput />
 			<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} perPage={10}
 				sort={{ field: 'name', order: 'ASC' }}
