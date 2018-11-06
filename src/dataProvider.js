@@ -1,7 +1,5 @@
-import { restClient, authClient } from 'aor-feathers-client';
+import { restClient, authClient } from 'ra-data-feathers';
 import feathers, { rest, authentication } from '@feathersjs/client'
-// import rest from '@feathersjs/rest-client';
-// import auth from '@feathersjs/authentication-client';
 import $ from 'jquery'
 
 const feathersClient = feathers();
