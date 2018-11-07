@@ -6,6 +6,7 @@ import { change } from 'redux-form';
 import { showNotification, REDUX_FORM_NAME } from 'react-admin';
 import { workImageUpdate } from './cloudinaryActions';
 import { Image, Transformation } from 'cloudinary-react';
+import { imageCreate } from './cloudinaryActions';
 
 
 class CloudinaryWorkImage extends Component {
@@ -92,8 +93,21 @@ class CloudinaryWorkImage extends Component {
 	}
 
 	putImageToWork(image) {
-		const { change } = this.props;
+		const { change, record, imageCreate } = this.props;
 		change(REDUX_FORM_NAME, 'image', image);
+
+		// put to database
+
+		imageCreate(image, (payload, requestPayload) => {
+			const { record, change, fieldName } = this.props;
+			var images = record.images;
+			if(images && images.length) {
+				images.push(payload.data.id);
+			} else {
+				images = [payload.data.id];
+			}
+			change(REDUX_FORM_NAME, 'images', images);
+		});
 	}
 
 	render() {
@@ -143,7 +157,8 @@ CloudinaryWorkImage.propTypes = {
     record: PropTypes.object,
     showNotification: PropTypes.func,
     workImageUpdate: PropTypes.func,
-    change: PropTypes.func
+    change: PropTypes.func,
+    imageCreate: PropTypes.func
 };
 
 CloudinaryWorkImage.contextTypes = {
@@ -160,5 +175,6 @@ export default connect(null, {
 	showNotification,
 	push,
 	workImageUpdate,
-	change
+	change,
+	imageCreate
 })(CloudinaryWorkImage);
