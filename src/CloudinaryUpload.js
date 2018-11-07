@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
 import { change } from 'redux-form';
-import { showNotification, REDUX_FORM_NAME } from 'react-admin';
+import { fetchStart, fetchEnd, showNotification, REDUX_FORM_NAME } from 'react-admin';
 import { imageCreate } from './cloudinaryActions';
 import { Image, Transformation } from 'cloudinary-react';
 
@@ -11,7 +11,7 @@ import { Image, Transformation } from 'cloudinary-react';
 class CloudinaryUpload extends Component {
 	constructor(props, context) {
 		super(props, context);
-		this.state = { uploadedPhotos: [] };
+		this.state = { uploadedPhotos: [], photos: [] };
 		this.photoId = 1;
 		this.handleFiles = this.handleFiles.bind(this);
 		this.drop = this.drop.bind(this);
@@ -21,7 +21,10 @@ class CloudinaryUpload extends Component {
 	}
 
 	componentDidMount() {
-
+		const { record } = this.props;
+		this.setState({
+			photos: record.images && record.images.length ? record.images : [] 
+		});
 	}
 
 	// *********** Upload file to Cloudinary ******************** //
@@ -50,10 +53,6 @@ class CloudinaryUpload extends Component {
 		      var response = JSON.parse(xhr.responseText);
 		      //put to database
 		      this.putImageToDatabase(response);
-		      this.state.uploadedPhotos.push(response);
-		      this.setState({
-		      	uploadedPhotos: this.state.uploadedPhotos
-		      });
 		  }
 		}.bind(this);
 		fd.append('upload_preset', this.context.uploadPreset);
@@ -84,24 +83,36 @@ class CloudinaryUpload extends Component {
 	}
 
 	// *********** Handle selected files ******************** //
-	handleFiles(files) {
-		for (var i = 0; i < files.length; i++) {
-		    this.uploadFile(files[i]); // call the function to upload the file
+	handleFiles(files) {		
+		console.log("creating images");
+		for (const image of files) {
+			
+		    this.uploadFile(image); // call the function to upload the file
 		}
+		console.log("done creating images");
+		
+		
 	}
 
 	putImageToDatabase(image) {
-		const { imageCreate } = this.props;
+		const { imageCreate, fetchStart } = this.props;
+		fetchStart();
 		console.log("creating image");
 		imageCreate(image, (payload, requestPayload) => {
-			const { record, change, fieldName } = this.props;
-			var images = record.images;
-			if(images && images.length) {
-				images.push(payload.data.id);
-			} else {
-				images = [payload.data.id];
-			}
-			change(REDUX_FORM_NAME, fieldName, images);
+			this.state.uploadedPhotos.push(payload.data);
+		    this.setState({
+		    	uploadedPhotos: this.state.uploadedPhotos
+		    });
+			const { record, change, fieldName, fetchEnd } = this.props;
+			this.state.photos.push(payload.data.id);
+			this.setState({
+				photos: this.state.photos
+			});
+			change(REDUX_FORM_NAME, fieldName, this.state.photos);
+			console.log("fotos: "+this.state.photos.length);
+			console.log("new fotos: "+this.state.uploadedPhotos.length);
+			console.log("changed form");
+			fetchEnd();
 		});
 	}
 
@@ -152,7 +163,9 @@ CloudinaryUpload.propTypes = {
     record: PropTypes.object,
     showNotification: PropTypes.func,
     imageCreate: PropTypes.func,
-    change: PropTypes.func
+    change: PropTypes.func,
+    fetchEnd: PropTypes.func,
+    fetchStart: PropTypes.func
 };
 
 CloudinaryUpload.contextTypes = {
@@ -169,5 +182,7 @@ export default connect(null, {
 	showNotification,
 	push,
 	imageCreate,
-	change
+	change,
+	fetchStart,
+	fetchEnd
 })(CloudinaryUpload);
