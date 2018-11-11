@@ -6,7 +6,7 @@ import { change } from 'redux-form';
 import { showNotification, REDUX_FORM_NAME } from 'react-admin';
 import { workImageUpdate } from './cloudinaryActions';
 import { Image, Transformation } from 'cloudinary-react';
-import { imageCreate } from './cloudinaryActions';
+import { imageCreate, s3Upload } from './cloudinaryActions';
 
 
 class CloudinaryWorkImage extends Component {
@@ -16,6 +16,7 @@ class CloudinaryWorkImage extends Component {
 		this.photoId = 1;
 		this.handleFiles = this.handleFiles.bind(this);
 		this.drop = this.drop.bind(this);
+		this.putImageToWork = this.putImageToWork.bind(this)
 		this.fileInput = React.createRef();
 		this.progressBar = React.createRef();
 		this.progressElement = React.createRef();
@@ -87,17 +88,37 @@ class CloudinaryWorkImage extends Component {
 
 	// *********** Handle selected files ******************** //
 	handleFiles(files) {
+		const { s3Upload, fetchStart } = this.props;
+		const { putImageToWork } = this;
+
 		for (var i = 0; i < files.length; i++) {
-		    this.uploadFile(files[i]); // call the function to upload the file
+			const image = files[i];
+		    const reader = new FileReader();
+			reader.addEventListener('load', () => {
+				s3Upload({uri: reader.result, type: 'image'}, (payload, requestPayload) => {
+					console.log("uploaded");
+					console.log(payload);
+					var imageForDb = payload.data;
+					imageForDb.fileName = image.name;
+					imageForDb.size = image.size;
+					imageForDb.type = image.type;
+					delete imageForDb.uri;
+					delete imageForDb.id;
+					putImageToWork(imageForDb);
+				})
+			})
+			reader.readAsDataURL(image);
 		}
 	}
 
 	putImageToWork(image) {
-		const { change, record, imageCreate } = this.props;
+		console.log("put image to work")
+		const { change, imageCreate } = this.props;
+		
 		change(REDUX_FORM_NAME, 'image', image);
 
 		// put to database
-
+		this.state.uploadedPhotos.push(image);
 		imageCreate(image, (payload, requestPayload) => {
 			const { record, change, fieldName } = this.props;
 			var images = record.images;
@@ -107,6 +128,9 @@ class CloudinaryWorkImage extends Component {
 				images = [payload.data.id];
 			}
 			change(REDUX_FORM_NAME, 'images', images);
+		      this.setState({
+		      	uploadedPhotos: this.state.uploadedPhotos
+		      });
 		});
 	}
 
@@ -137,6 +161,16 @@ class CloudinaryWorkImage extends Component {
 				</div>
 				<div className="uploaded-images">
 					{this.state.uploadedPhotos.map(image => {
+						if(image.s3_url) {
+							return (
+								<span key={image.public_id}>
+									<Image publicId={image.s3_url} secure="true" type="fetch">
+										<Transformation width="200" crop="fill"/>
+										<Transformation fetchFormat="auto" quality="80"/>
+									</Image>
+								</span>
+								)
+						}
 						return (
 							<span key={image.public_id}>
 								<Image publicId={image.public_id} secure="true">
@@ -158,7 +192,8 @@ CloudinaryWorkImage.propTypes = {
     showNotification: PropTypes.func,
     workImageUpdate: PropTypes.func,
     change: PropTypes.func,
-    imageCreate: PropTypes.func
+    imageCreate: PropTypes.func,
+    s3Upload: PropTypes.func
 };
 
 CloudinaryWorkImage.contextTypes = {
@@ -176,5 +211,6 @@ export default connect(null, {
 	push,
 	workImageUpdate,
 	change,
-	imageCreate
+	imageCreate,
+	s3Upload
 })(CloudinaryWorkImage);
