@@ -66,3 +66,26 @@ export const workImageUpdate = (id, work) => ({
     	}
     },
 });
+
+export const S3_UPLOAD = 'S3_UPLOAD';
+export const s3Upload = (data, callback) => ({
+    type: S3_UPLOAD,
+    payload: { data: { ...data } },
+    meta: { 
+        fetch: CREATE, 
+        resource: 'upload-s3',
+        onSuccess: {
+            notification: {
+                    body: 'Abbildung wurde gespeichert.',
+                    level: 'info'
+            },
+            callback:  ({ payload, requestPayload }) => { callback(payload, requestPayload) }
+        },
+        onFailure: {
+            notification: {
+                    body: 'Fehler: Abbildung wurde nicht gespeichert.',
+                    level: 'warning'
+            }
+        }
+    },
+});
