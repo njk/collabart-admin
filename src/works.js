@@ -67,8 +67,19 @@ const WorksFilter = (props) => (
     </Filter>
 );
 
-const SmallImageField = ( { record, width } ) => 
-	record && record.image
+const SmallImageField = ( { record, width } ) => {
+	if(record && record.image && record.image.s3_url) {
+		return 		(
+			<span>
+				<Image publicId={record.image.s3_url} secure="true" type="fetch">
+					<Transformation width={width} crop="fill"/>
+					<Transformation fetchFormat="auto" quality="80"/>
+				</Image>
+			</span>
+		)		
+
+	}
+	return record && record.image
 	? 
 		(
 			<span>
@@ -79,6 +90,8 @@ const SmallImageField = ( { record, width } ) =>
 			</span>
 		)
 	: null;
+}
+	
 
 const ImagesField = ( { record } ) => 
 	record && record.images && record.images.length > 1
@@ -153,11 +166,7 @@ const ImageInformation = ( { record } ) => {
 		?
 		(
 			<span>
-				<p>Auflösung</p>
-				<p>{record.image.height}x{record.image.width}</p>
-				<p>Format: {record.image.format}</p>
-				<p>Oringinal</p>
-				<p>Komprimiert</p>
+				<p><a href={record.image.s3_url || record.image.secure_url}>Link zur vollen Auflösung</a></p>
 			</span>
 		)
 		: null
@@ -191,7 +200,14 @@ const WorkImageCloudinaryInput = ({record}) => {
 }
 
 const CloudinaryImageField = ({record}) => {
-	
+	if(record && record.s3_url) {
+		return (
+			<Image publicId={record.s3_url} secure="true" type="fetch">
+				<Transformation width="400" crop="fill"/>
+				<Transformation fetchFormat="auto" quality="80"/>
+			</Image>
+		)
+	}
 	return record ? (
 		<Image publicId={record.public_id} secure="true">
 			<Transformation width="400" crop="fill"/>
@@ -480,50 +496,7 @@ export const WorksCreate = (props) => (
 				filterToQuery={searchText => ({ 'name.last': searchText })}>
 				<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} allowEmpty />
 			</ReferenceArrayInput>
-			<TextInput source="title" label="Titel" />			
-			<DimensionsInput />
-			<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} perPage={10}
-				sort={{ field: 'name', order: 'ASC' }}
-				filterToQuery={searchText => ({ 'name': searchText })}>
-				<AutocompleteArrayInput optionText={techniquesInputRenderer} allowEmpty />
-			</ReferenceArrayInput>
-			<NumberInput source="publishedDate" 
-				format={v => {
-					if(v){
-						const date = new Date(v);
-						return date.getFullYear();
-					} else {
-						return ''
-					}
-				}} 
-				parse={v => {
-					if(v){
-						const date = new Date().setFullYear(v);
-						return date;
-					} else {
-						return ''
-					}
-				}} label="Jahr" />
-			<NumberInput source="publishedDateAlternative" 
-				format={v => {
-					if(v){
-						const date = new Date(v);
-						return date.getFullYear();
-					} else {
-						return ''
-					}
-				}} 
-				parse={v => {
-					if(v){
-						const date = new Date().setFullYear(v);
-						return date;
-					} else {
-						return ''
-					}
-				}} label="alternatives Jahr" />
-			<TextInput source="dateDivider" label="Trennzeichen" />
-			<BooleanInput source="isDateNotExact" label="ungenaue Jahresangabe"/>
-			<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
+			<TextInput source="title" label="Titel" />
         </SimpleForm>
     </Create>
 );
