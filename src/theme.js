@@ -1,12 +1,12 @@
 import { createMuiTheme } from '@material-ui/core/styles';
-import grey from '@material-ui/core/colors/grey';
+import lightBlue from '@material-ui/core/colors/lightBlue';
 import red from '@material-ui/core/colors/red';
 
 const myTheme = createMuiTheme({
     palette: {
     	type: 'light',
-        primary: grey,
-        secondary: grey,
+        primary: lightBlue,
+        secondary: lightBlue,
         error: red,
         contrastThreshold: 3,
         tonalOffset: 0.2,

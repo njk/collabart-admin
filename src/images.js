@@ -25,6 +25,7 @@ const SmallImageField = ( { record, width } ) => {
 				<Transformation width={width} crop="fill"/>
 				<Transformation fetchFormat="auto" quality="80"/>
 			</Image>
+			<p><a href={record.s3_url || record.secure_url}>Link zur vollen Auflösung</a></p>			
 		</span>
 	)
 }
