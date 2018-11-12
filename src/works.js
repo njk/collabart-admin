@@ -17,6 +17,7 @@ import {
 	TextField,
 	RichTextField,
 	BooleanField,
+	ArrayField,
 	ReferenceArrayField,
 	SingleFieldList,
 	ShowButton,
@@ -467,19 +468,19 @@ export const WorksEdit = (props) => (
 		    <FormTab label="Bilder" path="images">
 		    	
 		    	<CreateImageButton />
-				 <ReferenceArrayField
-			          reference="images"
-			          source="images"
-			          sort={{ field: 'created_at', order: 'DESC' }}
-			          label=""
-			        >
-			          <Datagrid>
-						<TextField source="name" label="Titel"/>			          
-			            <CloudinaryImageField />
-						<RichTextField source="note" label="Notizen"/>
-						<EditImageButton/>		            
-			          </Datagrid>
-		        </ReferenceArrayField>
+					<ReferenceArrayField
+						reference="images"
+						source="images"
+						sort={{ field: 'created_at', order: 'DESC' }}
+						label=""
+						>
+							<Datagrid>
+								<TextField source="name" label="Titel"/>
+								<CloudinaryImageField />
+								<RichTextField source="note" label="Notizen"/>
+								<EditImageButton/>
+							</Datagrid>
+					</ReferenceArrayField>
 		        <DisabledInput source="images" className="no-display"/>
 		    </FormTab>
 			<FormTab label="Freigaben" path="sharing">

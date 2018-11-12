@@ -34,7 +34,7 @@ class EditImageButtonComp extends Component {
 		    className={classes.button}
 		    variant="raised"
 		    component={Link}
-		    to={`/images/${record.id}`}
+		    to={`/images/${record._id || record.id}`}
 		    label="Bearbeiten"
 		    title="Bearbeiten"
 		  >
