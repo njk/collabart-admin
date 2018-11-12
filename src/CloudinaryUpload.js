@@ -4,7 +4,7 @@ import { push } from 'react-router-redux';
 import { connect } from 'react-redux';
 import { change } from 'redux-form';
 import { fetchStart, fetchEnd, showNotification, REDUX_FORM_NAME } from 'react-admin';
-import { imageCreate } from './cloudinaryActions';
+import { imageCreate, s3Upload } from './cloudinaryActions';
 import { Image, Transformation } from 'cloudinary-react';
 
 
@@ -15,6 +15,7 @@ class CloudinaryUpload extends Component {
 		this.photoId = 1;
 		this.handleFiles = this.handleFiles.bind(this);
 		this.drop = this.drop.bind(this);
+		this.putImageToDatabase = this.putImageToDatabase.bind(this);
 		this.fileInput = React.createRef();
 		this.progressBar = React.createRef();
 		this.progressElement = React.createRef();
@@ -26,40 +27,6 @@ class CloudinaryUpload extends Component {
 			photos: record.images && record.images.length ? record.images : [] 
 		});
 	}
-
-	// *********** Upload file to Cloudinary ******************** //
-	uploadFile(file) {
-		var url = `https://api.cloudinary.com/v1_1/${this.context.cloudName}/upload`;
-		var xhr = new XMLHttpRequest();
-		var fd = new FormData();
-		xhr.open('POST', url, true);
-		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-	  // Reset the upload progress bar
-	  this.progressElement.current.style.width = 0;
-	  
-	  // Update progress (can be used to show progress indicator)
-	  xhr.upload.addEventListener("progress", function(e) {
-	  	var progress = Math.round((e.loaded * 100.0) / e.total);
-	  	this.progressElement.current.style.width = progress + "%";
-
-	  	console.log(`fileuploadprogress data.loaded: ${e.loaded},
-	  		data.total: ${e.total}`);
-	  }.bind(this));
-
-		  xhr.onreadystatechange = function(e) {
-		  	if (xhr.readyState === 4 && xhr.status === 200) {
-		      // File uploaded successfully
-		      var response = JSON.parse(xhr.responseText);
-		      //put to database
-		      this.putImageToDatabase(response);
-		  }
-		}.bind(this);
-		fd.append('upload_preset', this.context.uploadPreset);
-		fd.append('tags', 'browser_upload'); // Optional - add tag for image admin in Cloudinary
-		fd.append('file', file);
-		xhr.send(fd);		
-	}    
 
 	// ************************ Drag and drop ***************** //
 	dragenter(e) {
@@ -85,9 +52,25 @@ class CloudinaryUpload extends Component {
 	// *********** Handle selected files ******************** //
 	handleFiles(files) {		
 		console.log("creating images");
+		const { s3Upload, fetchStart } = this.props;
+		const { putImageToDatabase } = this;
+		
 		for (const image of files) {
-			
-		    this.uploadFile(image); // call the function to upload the file
+			fetchStart();
+			const reader = new FileReader();
+			reader.addEventListener('load', () => {
+				s3Upload({uri: reader.result, type: 'image'}, (payload, requestPayload) => {
+					console.log("uploaded");
+					console.log(payload);
+					var imageForDb = payload.data;
+					imageForDb.fileName = image.name;
+					imageForDb.size = image.size;
+					imageForDb.type = image.type;
+					delete imageForDb.uri;
+					putImageToDatabase(imageForDb);
+				})
+			})			
+			reader.readAsDataURL(image);
 		}
 		console.log("done creating images");
 		
@@ -96,7 +79,6 @@ class CloudinaryUpload extends Component {
 
 	putImageToDatabase(image) {
 		const { imageCreate, fetchStart } = this.props;
-		fetchStart();
 		console.log("creating image");
 		imageCreate(image, (payload, requestPayload) => {
 			this.state.uploadedPhotos.push(payload.data);
@@ -109,9 +91,6 @@ class CloudinaryUpload extends Component {
 				photos: this.state.photos
 			});
 			change(REDUX_FORM_NAME, fieldName, this.state.photos);
-			console.log("fotos: "+this.state.photos.length);
-			console.log("new fotos: "+this.state.uploadedPhotos.length);
-			console.log("changed form");
 			fetchEnd();
 		});
 	}
@@ -143,6 +122,14 @@ class CloudinaryUpload extends Component {
 				</div>
 				<div className="uploaded-images">
 					{this.state.uploadedPhotos.map(image => {
+						if(image.s3_url) {
+							return (<span key={image.id}>
+										<Image publicId={image.s3_url} secure="true" type="fetch">
+											<Transformation width="200" crop="fill"/>
+											<Transformation fetchFormat="auto" quality="80"/>
+										</Image>
+									</span>)
+						}
 						return (
 							<span key={image.public_id}>
 								<Image publicId={image.public_id} secure="true">
@@ -163,6 +150,7 @@ CloudinaryUpload.propTypes = {
     record: PropTypes.object,
     showNotification: PropTypes.func,
     imageCreate: PropTypes.func,
+    s3Upload: PropTypes.func,
     change: PropTypes.func,
     fetchEnd: PropTypes.func,
     fetchStart: PropTypes.func
@@ -182,6 +170,7 @@ export default connect(null, {
 	showNotification,
 	push,
 	imageCreate,
+	s3Upload,
 	change,
 	fetchStart,
 	fetchEnd

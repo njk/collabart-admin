@@ -7,8 +7,19 @@ const ImagesTitle = ({ record }) => {
     return <span>Abbildung: {record ? `"${record.name}"` : ''}</span>;
 };
 
-const SmallImageField = ( { record, width } ) => 
-	(
+const SmallImageField = ( { record, width } ) => {
+	if(record.s3_url) {
+		return (
+			<span>
+				<Image publicId={record.s3_url} secure="true" type="fetch">
+					<Transformation width={width} crop="fill"/>
+					<Transformation fetchFormat="auto" quality="80"/>
+				</Image>
+				<p><a href={record.s3_url || record.secure_url}>Link zur vollen Auflösung</a></p>
+			</span>
+		)
+	}
+	return (
 		<span>
 			<Image publicId={record.public_id} secure="true">
 				<Transformation width={width} crop="fill"/>
@@ -16,6 +27,7 @@ const SmallImageField = ( { record, width } ) =>
 			</Image>
 		</span>
 	)
+}
 
 export const ImagesEdit = (props) => {
 	return (
