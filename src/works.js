@@ -64,6 +64,7 @@ const WorksFilter = (props) => (
                 }
             />
         </ReferenceInput>
+        <BooleanInput label="gesichtet" source="sighted" alwaysOn />        
     </Filter>
 );
 
