@@ -314,7 +314,7 @@ export const WorksList = (props, showNotes) => (
 					        <TextField source="name" /> 
 					    </SingleFieldList>
 					</ReferenceArrayField>
-					<YearField label="Jahr" />
+					<YearField label="Jahr" sortBy="publishedDate"/>
 					<ReferenceArrayField
 				          reference="locations"
 				          source="locations"
