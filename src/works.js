@@ -36,7 +36,8 @@ import {
 	ExportButton, 
 	RefreshButton,
 	ListButton,
-	Button
+	Button,
+	Pagination
 	}
 	from 'react-admin';
 import CloudinaryWorkImage from './CloudinaryWorkImage';
@@ -50,21 +51,8 @@ import SightedWorksButton from './SightedWorksButton';
 
 const WorksFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="Titel" source="title" alwaysOn />        
-        <ReferenceInput 
-        	source="artists" 
-        	reference="artists" 
-        	label="Künstler"
-        	perPage={10} 
-        	sort={{ field: 'name.last', order: 'ASC' }}
-        	filterToQuery={searchText => ({ 'name.last': searchText })}
-        	alwaysOn>
-            <AutocompleteInput
-                optionText={choice =>
-                    `${choice.name.first} ${choice.name.last}`
-                }
-            />
-        </ReferenceInput>
+        <TextInput label="Titel" source="title" alwaysOn /> 
+        <TextInput label="Künstler" source="artistQuery" alwaysOn />
         {/** <BooleanInput label="gesichtet" source="sighted" alwaysOn />*/}
     </Filter>
 );
@@ -268,8 +256,10 @@ const WorksBulkActionButtons = props => (
 
 let showNotes = true;
 
+const WorksPagination = props => <Pagination rowsPerPageOptions={[5, 10, 20]} {...props} />
+
 export const WorksList = (props, showNotes) => (
-	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={<WorksBulkActionButtons />} actions={<WorksActions />} perPage={20}>
+	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={<WorksBulkActionButtons />} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />}>
 
 	<Responsive
 		small={
