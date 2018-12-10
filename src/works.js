@@ -6,6 +6,8 @@ import {
 	SimpleList,
 	FormTab,
 	TabbedForm,
+	TabbedShowLayout,
+	Tab,
 	Toolbar,
 	SaveButton,
 	AutocompleteArrayInput,
@@ -160,6 +162,14 @@ const ImageInformation = ( { record } ) => {
 			</span>
 		)
 		: null
+}
+
+const ImageLink = ( { record } ) => {
+	return (
+			<span>
+				<p><a href={record.s3_url || record.secure_url}>Link zur vollen Auflösung</a></p>
+			</span>
+		)
 }
 
 const YearField = ({ record }) => {
@@ -493,41 +503,64 @@ export const WorksCreate = (props) => (
     </Create>
 );
 
+const WorksShowActions = ({ basePath, data, resource }) => (
+    <CardActions>
+        <ListButton />
+    </CardActions>
+);
+
 export const WorksShow = (props) => (
-    <Show {...props} title={<WorksTitle />}>
-        <SimpleShowLayout>
-            <SmallImageField source="image" label="Abbildung" width="400"/>
-            <ImageInformation source="image" />
-            <ReferenceArrayField
-			    label="Künstler"
-			    reference="artists"
-			    source="artists"
-			>
-			    <SingleFieldList>
-			        <NameField />
-			    </SingleFieldList>
-			</ReferenceArrayField>
-			<TextField source="title" />
-            <DimensionsField label="Maße" source="dimensions"/>
- 			<ReferenceArrayField
-			    label="Techniken"
-			    reference="techniques"
-			    source="techniques"
-			>
-			    <SingleFieldList>
-			        <TextField source="name" /> 
-			    </SingleFieldList>
-			</ReferenceArrayField>
-			<YearField label="Jahr" />
-			<ReferenceArrayField
-			    label="Notizen"
-			    reference="notes"
-			    source="notes"
-			>
-			    <SingleFieldList>
-			        <RichTextField source="note" /> 
-			    </SingleFieldList>
-			</ReferenceArrayField>
-        </SimpleShowLayout>
+    <Show {...props} title={<WorksTitle />} actions={<WorksShowActions />}>
+        <TabbedShowLayout>
+        	<Tab label="Informationen">
+	            <SmallImageField source="image" label="Abbildung" width="400"/>
+	            <ImageInformation source="image" />
+	            <ReferenceArrayField
+				    label="Künstler"
+				    reference="artists"
+				    source="artists"
+				>
+				    <SingleFieldList>
+				        <NameField />
+				    </SingleFieldList>
+				</ReferenceArrayField>
+				<TextField source="title" />
+	            <DimensionsField label="Maße" source="dimensions"/>
+	 			<ReferenceArrayField
+				    label="Techniken"
+				    reference="techniques"
+				    source="techniques"
+				>
+				    <SingleFieldList>
+				        <TextField source="name" /> 
+				    </SingleFieldList>
+				</ReferenceArrayField>
+				<YearField label="Jahr" />
+				<ReferenceArrayField
+				    label="Notizen"
+				    reference="notes"
+				    source="notes"
+				>
+				    <SingleFieldList>
+				        <RichTextField source="note" /> 
+				    </SingleFieldList>
+				</ReferenceArrayField>
+			</Tab>
+			<Tab label="weitere Abbildungen">
+				<ReferenceArrayField
+						reference="images"
+						source="images"
+						sort={{ field: 'created_at', order: 'DESC' }}
+						label=""
+						>
+							<Datagrid>
+								<TextField source="name" label="Titel"/>
+								<CloudinaryImageField />
+								<RichTextField source="note" label="Notizen"/>
+								<ImageLink />
+							</Datagrid>
+					</ReferenceArrayField>			
+			</Tab>
+        </TabbedShowLayout>
     </Show>
 );
