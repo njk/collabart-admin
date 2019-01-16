@@ -3,7 +3,7 @@ import { List, Edit, Create, Datagrid, EditButton, SimpleForm, TextInput, Filter
 
 const ArtistsFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="Search" source="name.last" alwaysOn />
+        <TextInput label="Suche" source="name.last" alwaysOn />
     </Filter>
 );
 
@@ -18,9 +18,9 @@ const NameTextField = ( { record, ...rest } ) =>
 	: null;
 
 export const ArtistsList = (props) => (
-    <List {...props} title="Künstler" filters={<ArtistsFilter />} filter={{ in_collection: true }}>
+    <List {...props} title="Künstler" filters={<ArtistsFilter />} filter={{ in_collection: true }} sort={{ field: 'name.last', order: 'ASC' }}>
         <Datagrid>    
-            <NameTextField source="name" title="Name" />            
+            <NameTextField source="name" title="Name" sortBy="name.last" />            
             <EditButton />
         </Datagrid>
     </List>

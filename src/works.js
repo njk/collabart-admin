@@ -20,6 +20,9 @@ import {
 	RichTextField,
 	BooleanField,
 	ArrayField,
+	FunctionField,
+	ReferenceField,
+	ReferenceManyField,
 	ReferenceArrayField,
 	SingleFieldList,
 	ShowButton,
@@ -269,23 +272,20 @@ let showNotes = true;
 const WorksPagination = props => <Pagination rowsPerPageOptions={[5, 10, 20]} {...props} />
 
 export const WorksList = (props, showNotes) => (
-	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={<WorksBulkActionButtons />} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />}>
+	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: 'artists.name.last', order: 'ASC' }} >
 
 	<Responsive
 		small={
                 <SimpleList
                     primaryText={record => record.title}
-                    secondaryText={	record => <ReferenceArrayField
-					    label="Künstler"
-					    reference="artists"
-					    source="artists"
-					    record={record}
-					    basepath="artists"
-					>
-					    <SingleFieldList>
-					        <NameField />
-					    </SingleFieldList>
-					</ReferenceArrayField> 
+                    secondaryText={	record => 
+                    	<ReferenceArrayField label="Künstler" source="artists" reference="artists" sortBy="name.last">
+						    <SingleFieldList>
+						    	<FunctionField render={record => (
+						    		`${record.name.first} ${record.name.last}`
+						    	)}/>
+						    </SingleFieldList>
+						</ReferenceArrayField>	
 					}
                     tertiaryText={record => <YearField record={record}/>}
                     leftIcon={record => <SmallImageField record={record} source="image" label="Abbildung" width="200"/>}
@@ -294,15 +294,13 @@ export const WorksList = (props, showNotes) => (
         medium={
 		        <Datagrid>
 		            <SmallImageField source="image" label="Abbildung" width="200"/>
-					<ReferenceArrayField
-					    label="Künstler"
-					    reference="artists"
-					    source="artists"
-					>
+					<ReferenceArrayField label="Künstler" source="artists" reference="artists">
 					    <SingleFieldList>
-					        <NameField />
+					    	<FunctionField render={record => (
+					    		`${record.name.first} ${record.name.last}`
+					    	)}/>
 					    </SingleFieldList>
-					</ReferenceArrayField>         
+					</ReferenceArrayField>									 
 					<TextField source="title" label="Titel" />
 					<DimensionsField label="Maße" source="dimensions"/>
 		 			<ReferenceArrayField
