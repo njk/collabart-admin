@@ -3,7 +3,7 @@ import { List, Edit, Create, Datagrid, TextField, EditButton, SimpleForm, TextIn
 
 const TechniquesFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="Search" source="q" alwaysOn />
+        <TextInput label="Suche" source="name" alwaysOn />
     </Filter>
 );
 
