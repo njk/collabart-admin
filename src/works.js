@@ -36,9 +36,9 @@ import {
 	ReferenceArrayInput,
 	Filter,
 	FormDataConsumer,
-	CardActions, 
-	CreateButton, 
-	ExportButton, 
+	CardActions,
+	CreateButton,
+	ExportButton,
 	RefreshButton,
 	ListButton,
 	Button,
@@ -56,7 +56,7 @@ import SightedWorksButton from './SightedWorksButton';
 
 const WorksFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="Titel" source="title" alwaysOn /> 
+        <TextInput label="Titel" source="title" alwaysOn />
         <TextInput label="Künstler" source="artistQuery" alwaysOn />
         {/** <BooleanInput label="gesichtet" source="sighted" alwaysOn />*/}
     </Filter>
@@ -71,11 +71,11 @@ const SmallImageField = ( { record, width } ) => {
 					<Transformation fetchFormat="auto" quality="80"/>
 				</Image>
 			</span>
-		)		
+		)
 
 	}
 	return record && record.image
-	? 
+	?
 		(
 			<span>
 				<Image publicId={record.image.public_id} secure="true">
@@ -86,19 +86,19 @@ const SmallImageField = ( { record, width } ) => {
 		)
 	: null;
 }
-	
 
-const ImagesField = ( { record } ) => 
+
+const ImagesField = ( { record } ) =>
 	record && record.images && record.images.length > 1
-	? 
+	?
 		(
 			<span>
 				<FilterIcon />
 			</span>
 		)
-	: (<span></span>);	
+	: (<span></span>);
 
-const DimensionsField = ( { record } ) => 
+const DimensionsField = ( { record } ) =>
 	{
 		if(record && record.dimensions){
 			if(record.dimensions.diameter) {
@@ -112,7 +112,7 @@ const DimensionsField = ( { record } ) =>
 		return null;
 	}
 
-const DimensionsInput = ( { record } ) => 
+const DimensionsInput = ( { record } ) =>
 	{
 		return (
 			<span>
@@ -124,7 +124,7 @@ const DimensionsInput = ( { record } ) =>
 		    )
 	}
 
-const NameField = ( { record }) => 
+const NameField = ( { record }) =>
 {
 	return record && record.name
 		?
@@ -136,7 +136,7 @@ const NameField = ( { record }) =>
 		: null
 }
 
-const LocationButtonAdd = ( { record }) => 
+const LocationButtonAdd = ( { record }) =>
 {
 	return record && record.locations && record.locations.length
 		?
@@ -144,7 +144,7 @@ const LocationButtonAdd = ( { record }) =>
 		: <CreateLocationButton record={record}/>
 }
 
-const LocationField = ( { record }) => 
+const LocationField = ( { record }) =>
 {
 	return record && record.name
 		?
@@ -220,7 +220,7 @@ const CloudinaryImageField = ({record}) => {
 }
 
 
-const SharingInputs = ({ record }) => 
+const SharingInputs = ({ record }) =>
 	(
 		<span>
 			<BooleanInput label="online sichtbar" source="isPublic"/>
@@ -261,7 +261,7 @@ const WorksActions = ({
 
 const WorksBulkActionButtons = props => (
     <Fragment>
-        {/* Add the default bulk delete action 
+        {/* Add the default bulk delete action
         <BulkDeleteButton {...props} />*/}
         <SightedWorksButton {...props}/>
     </Fragment>
@@ -278,14 +278,14 @@ export const WorksList = (props, showNotes) => (
 		small={
                 <SimpleList
                     primaryText={record => record.title}
-                    secondaryText={	record => 
-                    	<ReferenceArrayField label="Künstler" source="artists" reference="artists" sortBy="name.last">
+                    secondaryText={	record =>
+                    	<ReferenceArrayField label="Künstler" source="artists" reference="artists" sortBy={'_sortArtists'}>
 						    <SingleFieldList>
 						    	<FunctionField render={record => (
 						    		`${record.name.first} ${record.name.last}`
 						    	)}/>
 						    </SingleFieldList>
-						</ReferenceArrayField>	
+						</ReferenceArrayField>
 					}
                     tertiaryText={record => <YearField record={record}/>}
                     leftIcon={record => <SmallImageField record={record} source="image" label="Abbildung" width="200"/>}
@@ -294,13 +294,18 @@ export const WorksList = (props, showNotes) => (
         medium={
 		        <Datagrid>
 		            <SmallImageField source="image" label="Abbildung" width="200"/>
-					<ReferenceArrayField label="Künstler" source="artists" reference="artists">
+					<ReferenceArrayField
+                        label="Künstler"
+                        source="artists"
+                        reference="artists"
+                        sortBy={'_sortArtists'}
+                    >
 					    <SingleFieldList>
 					    	<FunctionField render={record => (
 					    		`${record.name.first} ${record.name.last}`
 					    	)}/>
 					    </SingleFieldList>
-					</ReferenceArrayField>									 
+					</ReferenceArrayField>
 					<TextField source="title" label="Titel" />
 					<DimensionsField label="Maße" source="dimensions"/>
 		 			<ReferenceArrayField
@@ -309,7 +314,7 @@ export const WorksList = (props, showNotes) => (
 					    source="techniques"
 					>
 					    <SingleFieldList>
-					        <TextField source="name" /> 
+					        <TextField source="name" />
 					    </SingleFieldList>
 					</ReferenceArrayField>
 					<YearField label="Jahr" sortBy="publishedDate"/>
@@ -331,13 +336,13 @@ export const WorksList = (props, showNotes) => (
 					    sortable={false}
 					>
 					    <SingleFieldList>
-					        <RichTextField source="note" /> 
+					        <RichTextField source="note" />
 					    </SingleFieldList>
 					</ReferenceArrayField>
 					: <span>Hallo</span>
-			        }			
-				    
-					<ImagesField label="Abbildungen" sortable={false}/> 
+			        }
+
+					<ImagesField label="Abbildungen" sortable={false}/>
 					<ShowButton />
 		            <EditButton />
 		        </Datagrid>
@@ -383,19 +388,19 @@ export const WorksEdit = (props) => (
 			<FormTab label="Hauptinformationen" >
 				<SmallImageField source="image" label="Abbildung" width="400"/>
 				<WorkImageCloudinaryInput />
-				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
+				<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10}
 					sort={{ field: 'name.last', order: 'ASC' }}
 					filterToQuery={searchText => ({ 'name.last': searchText })}>
 					<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} allowEmpty/>
 				</ReferenceArrayInput>
-				<TextInput source="title" label="Titel" />				
+				<TextInput source="title" label="Titel" />
 				<DimensionsInput />
 				<ReferenceArrayInput source='techniques' reference='techniques' label={'Techniken'} perPage={10}
 					sort={{ field: 'name', order: 'ASC' }}
 					filterToQuery={searchText => ({ 'name': searchText })}>
 					<AutocompleteArrayInput optionText={techniquesInputRenderer} allowEmpty/>
 				</ReferenceArrayInput>
-				<NumberInput source="publishedDate" 
+				<NumberInput source="publishedDate"
 					format={v => {
 						if(v){
 							const date = new Date(v);
@@ -403,7 +408,7 @@ export const WorksEdit = (props) => (
 						} else {
 							return ''
 						}
-					}} 
+					}}
 					parse={v => {
 						if(v){
 							const date = new Date().setFullYear(v);
@@ -412,7 +417,7 @@ export const WorksEdit = (props) => (
 							return ''
 						}
 					}} label="Jahr" />
-				<NumberInput source="publishedDateAlternative" 
+				<NumberInput source="publishedDateAlternative"
 					format={v => {
 						if(v){
 							const date = new Date(v);
@@ -420,7 +425,7 @@ export const WorksEdit = (props) => (
 						} else {
 							return ''
 						}
-					}} 
+					}}
 					parse={v => {
 						if(v){
 							const date = new Date().setFullYear(v);
@@ -439,16 +444,16 @@ export const WorksEdit = (props) => (
 			          reference="locations"
 			          source="locations"
 			          label="Lagerort"
-			          sort={{ field: 'created_at', order: 'DESC' }}	
+			          sort={{ field: 'created_at', order: 'DESC' }}
 			        >
 			        	<SingleFieldList>
 			          		<TextField source="name" />
 			          	</SingleFieldList>
 		        </ReferenceArrayField>
-		        <LocationButtonAdd />		    		        
+		        <LocationButtonAdd />
 		    </FormTab>
 		    <FormTab label="Notizen" path="notes">
-		    	
+
 		    	<CreateNoteButton />
 	    		<ReferenceArrayField
 			          reference="notes"
@@ -464,7 +469,7 @@ export const WorksEdit = (props) => (
 		        <DisabledInput source="notes" className="no-display"/>
 		    </FormTab>
 		    <FormTab label="Bilder" path="images">
-		    	
+
 		    	<CreateImageButton />
 					<ReferenceArrayField
 						reference="images"
@@ -482,8 +487,8 @@ export const WorksEdit = (props) => (
 		        <DisabledInput source="images" className="no-display"/>
 		    </FormTab>
 			<FormTab label="Freigaben" path="sharing">
-	    		<SharingInputs /> 
-		    </FormTab>		    
+	    		<SharingInputs />
+		    </FormTab>
 		</TabbedForm>
 	</Edit>
 );
@@ -491,7 +496,7 @@ export const WorksEdit = (props) => (
 export const WorksCreate = (props) => (
     <Create {...props}>
         <SimpleForm>
-			<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10} 
+			<ReferenceArrayInput source='artists' reference='artists' label={'Künstler'} perPage={10}
 				sort={{ field: 'name.last', order: 'ASC' }}
 				filterToQuery={searchText => ({ 'name.last': searchText })}>
 				<AutocompleteArrayInput optionValue="id" optionText={artistInputRenderer} allowEmpty />
@@ -530,7 +535,7 @@ export const WorksShow = (props) => (
 				    source="techniques"
 				>
 				    <SingleFieldList>
-				        <TextField source="name" /> 
+				        <TextField source="name" />
 				    </SingleFieldList>
 				</ReferenceArrayField>
 				<YearField label="Jahr" />
@@ -540,7 +545,7 @@ export const WorksShow = (props) => (
 				    source="notes"
 				>
 				    <SingleFieldList>
-				        <RichTextField source="note" /> 
+				        <RichTextField source="note" />
 				    </SingleFieldList>
 				</ReferenceArrayField>
 			</Tab>
@@ -557,7 +562,7 @@ export const WorksShow = (props) => (
 								<RichTextField source="note" label="Notizen"/>
 								<ImageLink />
 							</Datagrid>
-					</ReferenceArrayField>			
+					</ReferenceArrayField>
 			</Tab>
         </TabbedShowLayout>
     </Show>
