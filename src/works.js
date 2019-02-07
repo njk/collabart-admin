@@ -272,34 +272,53 @@ let showNotes = true;
 const WorksPagination = props => <Pagination rowsPerPageOptions={[5, 10, 20]} {...props} />
 
 export const WorksList = (props, showNotes) => (
-	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: 'artists.name.last', order: 'ASC' }} >
+	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: 'artists.0', order: 'DESC' }}>
 
 	<Responsive
-		small={
-                <SimpleList
-                    primaryText={record => record.title}
-                    secondaryText={	record => 
-                    	<ReferenceArrayField label="Künstler" source="artists" reference="artists" sortBy="name.last">
-						    <SingleFieldList>
-						    	<FunctionField render={record => (
+		medium={
+		        <Datagrid>
+		            <SmallImageField source="image" label="Abbildung" width="50" sortable={false}/>
+					<ReferenceArrayField
+						label="Künstler"
+						source="artists"
+						reference="artists"
+						sortBy={"artists.0"}
+						>
+					    <SingleFieldList>
+							<FunctionField render={record => (
 						    		`${record.name.first} ${record.name.last}`
 						    	)}/>
-						    </SingleFieldList>
-						</ReferenceArrayField>	
-					}
-                    tertiaryText={record => <YearField record={record}/>}
-                    leftIcon={record => <SmallImageField record={record} source="image" label="Abbildung" width="200"/>}
-                />
+						</SingleFieldList>
+					</ReferenceArrayField>									 
+					<TextField source="title" label="Titel" />
+					<ReferenceArrayField
+				          reference="locations"
+				          source="locations"
+				          label="Lagerort"
+				          sortBy={'locations.0'}
+				        >
+					    	<SingleFieldList>
+				          		<LocationField source="name" />
+				          	</SingleFieldList>
+			        </ReferenceArrayField>
+					<ShowButton />
+		            <EditButton />
+		        </Datagrid>
             }
-        medium={
+        large={
 		        <Datagrid>
 		            <SmallImageField source="image" label="Abbildung" width="200"/>
-					<ReferenceArrayField label="Künstler" source="artists" reference="artists">
+					<ReferenceArrayField
+						label="Künstler"
+						source="artists"
+						reference="artists"
+						sortBy={"artists.0"}
+						>
 					    <SingleFieldList>
-					    	<FunctionField render={record => (
-					    		`${record.name.first} ${record.name.last}`
-					    	)}/>
-					    </SingleFieldList>
+							<FunctionField render={record => (
+						    		`${record.name.first} ${record.name.last}`
+						    	)}/>
+						</SingleFieldList>
 					</ReferenceArrayField>									 
 					<TextField source="title" label="Titel" />
 					<DimensionsField label="Maße" source="dimensions"/>
@@ -307,6 +326,7 @@ export const WorksList = (props, showNotes) => (
 					    label="Techniken"
 					    reference="techniques"
 					    source="techniques"
+					    sortBy={'techniques.0'}
 					>
 					    <SingleFieldList>
 					        <TextField source="name" /> 
@@ -317,6 +337,7 @@ export const WorksList = (props, showNotes) => (
 				          reference="locations"
 				          source="locations"
 				          label="Lagerort"
+				          sortBy={'locations.0'}
 				        >
 					    	<SingleFieldList>
 				          		<LocationField source="name" />
