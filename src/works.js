@@ -10,6 +10,7 @@ import {
 	Tab,
 	Toolbar,
 	SaveButton,
+	DeleteButton,
 	AutocompleteArrayInput,
 	DisabledInput,
 	List,
@@ -58,7 +59,9 @@ const WorksFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Titel" source="title" alwaysOn />
         <TextInput label="Künstler" source="artistQuery" alwaysOn />
-        {/** <BooleanInput label="gesichtet" source="sighted" alwaysOn />*/}
+        <TextInput label="Notizen" source="notesQuery" />
+        <TextInput label="Lagerort" source="locationQuery" />
+        <BooleanInput label="gesichtet" source="sighted" />
     </Filter>
 );
 
@@ -272,7 +275,8 @@ let showNotes = true;
 const WorksPagination = props => <Pagination rowsPerPageOptions={[5, 10, 20]} {...props} />
 
 export const WorksList = (props, showNotes) => (
-	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: '_sortArtists', order: 'DESC' }}>
+
+	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: '_sortArtists', order: 'ASC' }} >
 
 	<Responsive
 		medium={
@@ -326,7 +330,7 @@ export const WorksList = (props, showNotes) => (
 					    label="Techniken"
 					    reference="techniques"
 					    source="techniques"
-					    sortBy={'techniques.0'}
+					    sortable={false}
 					>
 					    <SingleFieldList>
 					        <TextField source="name" />
@@ -337,7 +341,7 @@ export const WorksList = (props, showNotes) => (
 				          reference="locations"
 				          source="locations"
 				          label="Lagerort"
-				          sortBy={'locations.0'}
+				          sortable={false}
 				        >
 					    	<SingleFieldList>
 				          		<LocationField source="name" />
@@ -380,14 +384,15 @@ const WorksEditToolbar = props => (
     	<SaveButton
             label="Speichern"
             redirect={false}
-            submitOnEnter={true}
+            submitonenter={true}
         />
 		<SaveButton
             label="Speichern und zur Liste"
             redirect="list"
-            submitOnEnter={false}
+            submitonenter={false}
             variant="flat"
         />
+        <DeleteButton />
     </Toolbar>
 );
 
