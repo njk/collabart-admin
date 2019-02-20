@@ -10,6 +10,7 @@ import {
 	Tab,
 	Toolbar,
 	SaveButton,
+	DeleteButton,
 	AutocompleteArrayInput,
 	DisabledInput,
 	List,
@@ -58,7 +59,9 @@ const WorksFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Titel" source="title" alwaysOn />
         <TextInput label="Künstler" source="artistQuery" alwaysOn />
-        {/** <BooleanInput label="gesichtet" source="sighted" alwaysOn />*/}
+        <TextInput label="Notizen" source="notesQuery" />
+        <TextInput label="Lagerort" source="locationQuery" />
+        <BooleanInput label="gesichtet" source="sighted" />
     </Filter>
 );
 
@@ -272,28 +275,42 @@ let showNotes = true;
 const WorksPagination = props => <Pagination rowsPerPageOptions={[5, 10, 20]} {...props} />
 
 export const WorksList = (props, showNotes) => (
-	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: 'artists.name.last', order: 'ASC' }} >
+	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: '_sortArtists', order: 'ASC' }} >
 
 	<Responsive
-		small={
-                <SimpleList
-                    primaryText={record => record.title}
-                    secondaryText={	record =>
-                    	<ReferenceArrayField label="Künstler" source="artists" reference="artists" sortBy={'_sortArtists'}>
-						    <SingleFieldList>
-						    	<FunctionField render={record => (
+		medium={
+		        <Datagrid rowClick="show">
+		            <SmallImageField source="image" label="Abbildung" width="25" sortable={false}/>
+					<ReferenceArrayField
+						label="Künstler"
+						source="artists"
+						reference="artists"
+						sortBy={"_sortArtists"}
+						>
+					    <SingleFieldList>
+							<FunctionField render={record => (
 						    		`${record.name.first} ${record.name.last}`
 						    	)}/>
-						    </SingleFieldList>
-						</ReferenceArrayField>
-					}
-                    tertiaryText={record => <YearField record={record}/>}
-                    leftIcon={record => <SmallImageField record={record} source="image" label="Abbildung" width="200"/>}
-                />
+						</SingleFieldList>
+					</ReferenceArrayField>									 
+					<TextField source="title" label="Titel" />
+					<ReferenceArrayField
+				          reference="locations"
+				          source="locations"
+				          label="Lagerort"
+				          sortBy={'locations.0'}
+				        >
+					    	<SingleFieldList>
+				          		<LocationField source="name" />
+				          	</SingleFieldList>
+			        </ReferenceArrayField>
+					<ShowButton />
+		            <EditButton />
+		        </Datagrid>
             }
-        medium={
-		        <Datagrid>
-		            <SmallImageField source="image" label="Abbildung" width="200"/>
+        large={
+		        <Datagrid rowClick="show">
+		            <SmallImageField source="image" label="Abbildung" width="200" sortable={false}/>
 					<ReferenceArrayField
                         label="Künstler"
                         source="artists"
@@ -312,6 +329,7 @@ export const WorksList = (props, showNotes) => (
 					    label="Techniken"
 					    reference="techniques"
 					    source="techniques"
+					    sortable={false}
 					>
 					    <SingleFieldList>
 					        <TextField source="name" />
@@ -322,6 +340,7 @@ export const WorksList = (props, showNotes) => (
 				          reference="locations"
 				          source="locations"
 				          label="Lagerort"
+				          sortable={false}
 				        >
 					    	<SingleFieldList>
 				          		<LocationField source="name" />
@@ -348,7 +367,7 @@ export const WorksList = (props, showNotes) => (
 		        </Datagrid>
         }
         />
-		    </List>
+	</List>
 
 );
 
@@ -364,14 +383,15 @@ const WorksEditToolbar = props => (
     	<SaveButton
             label="Speichern"
             redirect={false}
-            submitOnEnter={true}
+            submitonenter={true}
         />
 		<SaveButton
             label="Speichern und zur Liste"
             redirect="list"
-            submitOnEnter={false}
+            submitonenter={false}
             variant="flat"
         />
+        <DeleteButton />
     </Toolbar>
 );
 
