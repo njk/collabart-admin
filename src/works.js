@@ -272,7 +272,7 @@ const WorksBulkActionButtons = props => (
 
 let showNotes = true;
 
-const WorksPagination = props => <Pagination rowsPerPageOptions={[5, 10, 20]} {...props} />
+const WorksPagination = props => <Pagination rowsPerPageOptions={[10, 20, 50, 150]} {...props} />
 
 export const WorksList = (props, showNotes) => (
 	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: '_sortArtists', order: 'ASC' }} >
