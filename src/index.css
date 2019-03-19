@@ -11,7 +11,11 @@ header {
 }
 
 @media print {
-  div.headroom-wrapper, div.MuiDrawer-docked-245, div.MuiToolbar-root-45, div.MuiTablePagination-root-272, a.MuiButtonBase-root-153 {
+  div.headroom-wrapper, 
+  div[class*="MuiDrawer-docked"],
+  div[class*="MuiToolbar-root"],
+  div[class*="MuiTablePagination-root"],
+  a[class*="MuiButtonBase-root"] {
     display:none;
   }
 }
