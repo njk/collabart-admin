@@ -53,6 +53,7 @@ import {  CreateLocationButton } from './LocationButtons';
 import { EditNoteButton, CreateNoteButton } from './NoteButtons';
 import FilterIcon from '@material-ui/icons/Filter';
 import SightedWorksButton from './SightedWorksButton';
+import RichTextInput from 'ra-input-rich-text';
 
 
 const WorksFilter = (props) => (
@@ -280,6 +281,7 @@ export const WorksList = (props, showNotes) => (
 	<Responsive
 		medium={
 		        <Datagrid rowClick="show">
+		        	<TextField source="inventoryNumber" label="Inventarnummer"/>
 		            <SmallImageField source="image" label="Abbildung" width="25" sortable={false}/>
 					<ReferenceArrayField
 						label="Künstler"
@@ -310,6 +312,7 @@ export const WorksList = (props, showNotes) => (
             }
         large={
 		        <Datagrid rowClick="show">
+		        	<TextField source="inventoryNumber" label="Inventarnummer"/>
 		            <SmallImageField source="image" label="Abbildung" width="200" sortable={false}/>
 					<ReferenceArrayField
                         label="Künstler"
@@ -453,12 +456,13 @@ export const WorksEdit = (props) => (
 						} else {
 							return ''
 						}
-					}} label="alternatives Jahr" />
-				<TextInput source="dateDivider" label="Trennzeichen" />
+					}} label="alternatives Jahr (1948/1949)" />
+				<TextInput source="dateDivider" label="Trennzeichen (z.B. /)" />
 				<BooleanInput source="isDateNotExact" label="ungenaue Jahresangabe"/>
 				<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
 		    </FormTab>
 		    <FormTab label="Lagerinformationen" path="locations">
+		    	<TextInput source="inventoryNumber" label="Inventarnummer"/>
 		    	<BooleanInput source="sighted" label="gesichtet"/>
 	    		<ReferenceArrayField
 			          reference="locations"
@@ -471,6 +475,15 @@ export const WorksEdit = (props) => (
 			          	</SingleFieldList>
 		        </ReferenceArrayField>
 		        <LocationButtonAdd />
+		        <RichTextInput source="state" label="Zustand"/>
+		        <TextInput source="status" label="Status"/>
+		        <TextInput source="insuranceValue" label="Versicherungswert"/>
+				<TextInput source="frameSize" label="Rahmenmaß"/>
+		    </FormTab>
+		    <FormTab label="Sonstiges" path="other">
+		    	<RichTextInput source="showHistory" label="Ausstellungshistorie"/>
+		    	<RichTextInput source="literature" label="Literatur"/>
+		    	<RichTextInput source="provenance" label="Provenienz"/>
 		    </FormTab>
 		    <FormTab label="Notizen" path="notes">
 
