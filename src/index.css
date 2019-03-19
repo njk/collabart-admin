@@ -9,3 +9,13 @@ header {
   color: #000;
   background-color: #fff !important;
 }
+
+@media print {
+  div.headroom-wrapper, 
+  div[class*="MuiDrawer-docked"],
+  div[class*="MuiToolbar-root"],
+  div[class*="MuiTablePagination-root"],
+  a[class*="MuiButtonBase-root"] {
+    display:none;
+  }
+}
