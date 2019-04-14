@@ -11,11 +11,9 @@ header {
 }
 
 @media print {
-  div.headroom-wrapper, 
-  div[class*="MuiDrawer-docked"],
-  div[class*="MuiToolbar-root"],
-  div[class*="MuiTablePagination-root"],
-  a[class*="MuiButtonBase-root"] {
-    display:none;
-  }
+	a[role="button"],
+	div.headroom-wrapper,
+	main>div:first-child {
+		display:none;
+	}
 }
