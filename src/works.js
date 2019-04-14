@@ -148,6 +148,14 @@ const LocationButtonAdd = ( { record }) =>
 		: <CreateLocationButton record={record}/>
 }
 
+const WarehouseInfo = ( { record }) => 
+{
+	return (<span>
+				<div dangerouslySetInnerHTML={{__html: record.state}}></div><br/>
+				{record.status}
+			</span>)
+}
+
 const LocationField = ( { record }) =>
 {
 	return record && record.name
@@ -339,6 +347,7 @@ export const WorksList = (props, showNotes) => (
 					    </SingleFieldList>
 					</ReferenceArrayField>
 					<YearField label="Jahr" sortBy="publishedDate"/>
+					<WarehouseInfo label="Infos" sortable={false}/>
 					<ReferenceArrayField
 				          reference="locations"
 				          source="locations"
