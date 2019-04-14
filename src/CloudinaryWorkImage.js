@@ -26,45 +26,6 @@ class CloudinaryWorkImage extends Component {
 
 	}
 
-	// *********** Upload file to Cloudinary ******************** //
-	uploadFile(file) {
-		var url = `https://api.cloudinary.com/v1_1/${this.context.cloudName}/upload`;
-		var xhr = new XMLHttpRequest();
-		var fd = new FormData();
-		xhr.open('POST', url, true);
-		xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-	  // Reset the upload progress bar
-	  this.progressElement.current.style.width = 0;
-	  
-	  // Update progress (can be used to show progress indicator)
-	  xhr.upload.addEventListener("progress", function(e) {
-	  	var progress = Math.round((e.loaded * 100.0) / e.total);
-	  	this.progressElement.current.style.width = progress + "%";
-
-	  	console.log(`fileuploadprogress data.loaded: ${e.loaded},
-	  		data.total: ${e.total}`);
-	  }.bind(this));
-
-	  xhr.onreadystatechange = function(e) {
-	  	if (xhr.readyState === 4 && xhr.status === 200) {
-	      // File uploaded successfully
-	      var response = JSON.parse(xhr.responseText);
-	      //put to database
-	      this.putImageToWork(response);
-	      this.state.uploadedPhotos.push(response);
-	      this.setState({
-	      	uploadedPhotos: this.state.uploadedPhotos
-	      });
-	  }
-	}.bind(this);
-
-		fd.append('upload_preset', this.context.uploadPreset);
-		fd.append('tags', 'browser_upload'); // Optional - add tag for image admin in Cloudinary
-		fd.append('file', file);
-		xhr.send(fd);
-	}    
-
 	// ************************ Drag and drop ***************** //
 	dragenter(e) {
 		e.stopPropagation();

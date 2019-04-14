@@ -25,11 +25,14 @@ const myTheme = createMuiTheme({
     	backgroundColor: '#ffffff'
     },
     overrides: {
-        AppBar: { // override the styles of all instances of this component
-            root: { // Name of the rule
-                backgroundColor: '#ffffff', // Some CSS
+        MuiToolbar: {
+            root: {
+                '@media print': {
+                  display: "none"
+                }
             },
         },
+
     },
 });
 
