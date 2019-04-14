@@ -140,6 +140,21 @@ const NameField = ( { record }) =>
 		: null
 }
 
+const LocationNameField = ( {record} ) =>
+{
+	if (record && record.name) {
+		return (
+			<span>
+				Lagerort: {record.name}
+			</span>
+		)
+	}
+	if (record && record.name == "") {
+		return (<span>Lagerort eingeben</span>)
+	}
+	return null;
+}
+
 const LocationButtonAdd = ( { record }) =>
 {
 	return record && record.locations && record.locations.length
@@ -481,7 +496,7 @@ export const WorksEdit = (props) => (
 			          sort={{ field: 'created_at', order: 'DESC' }}
 			        >
 			        	<SingleFieldList>
-			          		<TextField source="name" />
+			        		<LocationNameField />
 			          	</SingleFieldList>
 		        </ReferenceArrayField>
 		        <LocationButtonAdd />
