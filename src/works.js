@@ -166,8 +166,8 @@ const LocationButtonAdd = ( { record }) =>
 const WarehouseInfo = ( { record }) => 
 {
 	return (<span>
-				<div dangerouslySetInnerHTML={{__html: record.state}}></div><br/>
-				{record.status}
+				Zustand: <div dangerouslySetInnerHTML={{__html: record.state}}></div><br/>
+				Status: {record.status}
 			</span>)
 }
 
