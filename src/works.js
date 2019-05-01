@@ -229,10 +229,7 @@ const WorkImageCloudinaryInput = ({record}) => {
 const CloudinaryImageField = ({record}) => {
 	if(record && record.s3_url) {
 		return (
-			<Image publicId={record.s3_url} secure="true" type="fetch">
-				<Transformation width="400" crop="fill"/>
-				<Transformation fetchFormat="auto" quality="80"/>
-			</Image>
+			<img src={record.s3_url} width="400"/>
 		)
 	}
 	return record ? (
