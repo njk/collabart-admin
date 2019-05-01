@@ -70,10 +70,7 @@ const SmallImageField = ( { record, width } ) => {
 	if(record && record.image && record.image.s3_url) {
 		return 		(
 			<span>
-				<Image publicId={record.image.s3_url} secure="true" type="fetch">
-					<Transformation width={width} crop="fill"/>
-					<Transformation fetchFormat="auto" quality="80"/>
-				</Image>
+				<img src={record.image.s3_url} width={width}/>
 			</span>
 		)
 
