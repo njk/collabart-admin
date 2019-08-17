@@ -60,6 +60,7 @@ const WorksFilter = (props) => (
     <Filter {...props}>
         <TextInput label="Titel" source="title" alwaysOn />
         <TextInput label="Künstler" source="artistQuery" alwaysOn />
+        <TextInput label="Techniken" source="techniqueQuery" />
         <TextInput label="Notizen" source="notesQuery" />
         <TextInput label="Lagerort" source="locationQuery" />
         <BooleanInput label="gesichtet" source="sighted" />
