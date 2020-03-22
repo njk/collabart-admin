@@ -10,7 +10,7 @@ export const API_URL = process.env.REACT_APP_BACKEND_URI
 function axiosClient () {
   const axiosClient = axios.create({
     baseURL: API_URL,
-    timeout: 15000,
+    timeout: 60000,
     headers: {
       Authorization: localStorage.getItem('auth')
     },
