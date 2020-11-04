@@ -504,6 +504,7 @@ export const WorksEdit = (props) => (
 		    	<RichTextInput source="showHistory" label="Ausstellungshistorie"/>
 		    	<RichTextInput source="literature" label="Literatur"/>
 		    	<RichTextInput source="provenance" label="Provenienz"/>
+		    	<RichTextInput source="bio" label="Biographie"/>
 		    </FormTab>
 		    <FormTab label="Notizen" path="notes">
 
