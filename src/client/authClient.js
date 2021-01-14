@@ -16,7 +16,7 @@ export default async (type, params) => {
       const decodedToken = decodeJwt(response.data.accessToken)
       localStorage.setItem('auth', 'bearer ' + response.data.accessToken)
 
-      const resUser = await axiosClient().get(`/users/${decodedToken.userId}`)
+      const resUser = await axiosClient().get(`/users/${decodedToken.sub}`)
       localStorage.setItem('role', resUser.data.permissions)
 
       return response.data.user
