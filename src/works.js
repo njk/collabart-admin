@@ -12,7 +12,6 @@ import {
 	SaveButton,
 	DeleteButton,
 	AutocompleteArrayInput,
-	DisabledInput,
 	List,
 	Edit,
 	Create,
@@ -54,6 +53,7 @@ import { EditNoteButton, CreateNoteButton } from './NoteButtons';
 import FilterIcon from '@material-ui/icons/Filter';
 import SightedWorksButton from './SightedWorksButton';
 import RichTextInput from 'ra-input-rich-text';
+import XLSX from 'xlsx';
 
 
 const WorksFilter = (props) => (
@@ -255,37 +255,99 @@ const SharingInputs = ({ record }) =>
 		</span>
 	)
 
+const stripHtml = (html) => {
+	if(!html) return
+   let tmp = document.createElement("DIV");
+   tmp.innerHTML = html;
+   return tmp.textContent || tmp.innerText || "";
+}
+
+const exporter = (records, fetchRelatedRecords) => {
+    // will call dataProvider.getMany('posts', { ids: records.map(record => record.post_id) }), ignoring duplicate and empty post_id
+    fetchRelatedRecords(records, 'id', 'works').then(posts => {
+        let data = records.map(record => ({
+        		...record,
+        		...record.dimensions,
+                artists_list: (record.artists_field && record.artists_field.length) ? record.artists_field.map(artist => `${artist.name.first} ${artist.name.last}`).toString() : "",
+                techniques_list: (record.techniques_field && record.techniques_field.length) ? record.techniques_field.map(technique => technique.name).toString() : "" ,
+                locations_list: (record.locations_field && record.locations_field.length) ? record.locations_field.map(location => location.name).toString() : "",
+                notes_list: (record.notes_field && record.notes_field.length) ? record.notes_field.map(note => note.name).toString() : "",
+                publishedYear: record.publishedDate ? new Date(record.publishedDate).getFullYear() : "",
+                state: stripHtml(record.state),
+                showHistory: stripHtml(record.showHistory),
+                provenance: stripHtml(record.provenance),
+                literature: stripHtml(record.literature),
+                bio: stripHtml(record.bio)
+        }));
+        data.splice(0, 0, {
+			artists_list: "Künstler", 
+			title: "Titel",
+			height: "Höhe",
+			width: "Breite",
+			depth: "Tiefe",
+			techniques_list: "Techniken",
+			publishedYear: "Jahr",
+			status: "Status",
+			state: "Zustand",
+			locations_list: "Lagerort",
+			sighted: "gesichtet",
+			notes_list: "Notizen",
+			frameSize: "Rahmenmaß",
+			insuranceValue: "Versicherungswert",
+			showHistory: "Ausstellungshistorie",
+			literature: "Literatur",
+			provenance: "Provenienz", 
+			bio: "Biographie",
+			_id: "werkliste.ch ID"
+        })
+		const headers = ['artists_list', 'title', 'height', 'width', 'depth', 'techniques_list', 'publishedYear', 'status', 'state', 'locations_list', 'sighted', 'notes_list', 'frameSize', 'insuranceValue', 'showHistory', 'literature', 'provenance', 'bio', '_id'] // order fields in the export
+		/* create a new blank workbook */
+		var wb = XLSX.utils.book_new();
+		var ws = XLSX.utils.json_to_sheet(data, { header: headers, skipHeader: true });
+		/* Add the worksheet to the workbook */
+		XLSX.utils.book_append_sheet(wb, ws, "Werke");
+
+		/* output format determined by filename */
+		XLSX.writeFile(wb, "Werkliste.xlsx");
+    });
+}
+
 const WorksActions = ({
-    bulkActions,
-    basePath,
-    displayedFilters,
-    filters,
-    filterValues,
-    onUnselectItems,
-    resource,
-    selectedIds,
-    showFilter
-}) => (
-    <CardActions>
-        {bulkActions && React.cloneElement(bulkActions, {
-            basePath,
-            filterValues,
-            resource,
-            selectedIds,
-            onUnselectItems,
-        })}
-        {filters && React.cloneElement(filters, {
-            resource,
-            showFilter,
-            displayedFilters,
-            filterValues,
-            context: 'button',
-        }) }
-        <CreateButton basePath={basePath} />
-        <RefreshButton />
-        {/* Add your custom actions */}
-    </CardActions>
-);
+	    bulkActions,
+	    basePath,
+	    displayedFilters,
+	    filters,
+	    filterValues,
+	    onUnselectItems,
+	    resource,
+	    selectedIds,
+	    showFilter
+	}) => (
+		<CardActions>
+	        {bulkActions && React.cloneElement(bulkActions, {
+	            basePath,
+	            filterValues,
+	            resource,
+	            selectedIds,
+	            onUnselectItems,
+	        })}
+	        {filters && React.cloneElement(filters, {
+	            resource,
+	            showFilter,
+	            displayedFilters,
+	            filterValues,
+	            context: 'button',
+	        }) }
+	        <CreateButton basePath={basePath} />
+	        <RefreshButton />
+	        <ExportButton
+	            resource={resource}
+	            filterValues={filterValues}
+	            exporter={exporter}
+	            maxResults={20000}
+	        />
+	    </CardActions>
+    )
 
 const WorksBulkActionButtons = props => (
     <Fragment>
@@ -300,7 +362,15 @@ let showNotes = true;
 const WorksPagination = props => <Pagination rowsPerPageOptions={[10, 20, 50, 150]} {...props} />
 
 export const WorksList = (props, showNotes) => (
-	<List {...props} title="Werke" filters={<WorksFilter />} bulkActionButtons={false} actions={<WorksActions />} perPage={20} pagination={<WorksPagination />} sort={{ field: '_sortArtists', order: 'ASC' }} >
+	<List {...props} 
+		title="Werke"
+		filters={<WorksFilter />}
+		bulkActionButtons={false}
+		actions={<WorksActions />}
+		perPage={20}
+		pagination={<WorksPagination />}
+		sort={{ field: '_sortArtists', order: 'ASC' }} 
+		>
 
 	<Responsive
 		medium={
@@ -525,7 +595,6 @@ export const WorksEdit = (props) => (
 						<EditNoteButton />
 			          </Datagrid>
 		        </ReferenceArrayField>
-		        <DisabledInput source="notes" className="no-display"/>
 		    </FormTab>
 		    <FormTab label="Bilder" path="images">
 
@@ -543,7 +612,6 @@ export const WorksEdit = (props) => (
 								<EditImageButton/>
 							</Datagrid>
 					</ReferenceArrayField>
-		        <DisabledInput source="images" className="no-display"/>
 		    </FormTab>
 			<FormTab label="Freigaben" path="sharing">
 	    		<SharingInputs />
