@@ -262,9 +262,8 @@ const stripHtml = (html) => {
    return tmp.textContent || tmp.innerText || "";
 }
 
-const exporter = (records, fetchRelatedRecords) => {
+const exporter = (records) => {
     // will call dataProvider.getMany('posts', { ids: records.map(record => record.post_id) }), ignoring duplicate and empty post_id
-    fetchRelatedRecords(records, 'id', 'works').then(posts => {
         let data = records.map(record => ({
         		...record,
         		...record.dimensions,
@@ -309,7 +308,7 @@ const exporter = (records, fetchRelatedRecords) => {
 
 		/* output format determined by filename */
 		XLSX.writeFile(wb, "Werkliste.xlsx");
-    });
+    
 }
 
 const WorksActions = ({
@@ -321,7 +320,9 @@ const WorksActions = ({
 	    onUnselectItems,
 	    resource,
 	    selectedIds,
-	    showFilter
+	    showFilter,
+	    total,
+	    currentSort
 	}) => (
 		<CardActions>
 	        {bulkActions && React.cloneElement(bulkActions, {
@@ -341,10 +342,12 @@ const WorksActions = ({
 	        <CreateButton basePath={basePath} />
 	        <RefreshButton />
 	        <ExportButton
+	        	disabled={total === 0}
 	            resource={resource}
-	            filterValues={filterValues}
+	            filter={filterValues}
+	            sort={currentSort}
 	            exporter={exporter}
-	            maxResults={20000}
+	            maxResults={2000}
 	        />
 	    </CardActions>
     )
