@@ -259,20 +259,26 @@ const stripHtml = (html) => {
 const exporter = (records) => {
     // will call dataProvider.getMany('posts', { ids: records.map(record => record.post_id) }), ignoring duplicate and empty post_id
         let data = records.map(record => ({
-        		...record,
         		...record.dimensions,
+        		title: record.title,
+        		sighted: record.sighted ? "Ja" : "Nein",
+        		frameSize: record.frameSize,
+        		insuranceValue: record.insuranceValue,
                 artists_list: (record.artists_field && record.artists_field.length) ? record.artists_field.map(artist => `${artist.name.first} ${artist.name.last}`).toString() : "",
                 techniques_list: (record.techniques_field && record.techniques_field.length) ? record.techniques_field.map(technique => technique.name).toString() : "" ,
                 locations_list: (record.locations_field && record.locations_field.length) ? record.locations_field.map(location => location.name).toString() : "",
-                notes_list: (record.notes_field && record.notes_field.length) ? record.notes_field.map(note => note.name).toString() : "",
+                notes_list: (record.notes_field && record.notes_field.length) ? record.notes_field.map(note => stripHtml(note.note)).toString() : "",
                 publishedYear: record.publishedDate ? new Date(record.publishedDate).getFullYear() : "",
                 state: stripHtml(record.state),
+                status: stripHtml(record.status),
                 showHistory: stripHtml(record.showHistory),
                 provenance: stripHtml(record.provenance),
                 literature: stripHtml(record.literature),
-                bio: stripHtml(record.bio)
+                bio: stripHtml(record.bio),
+                inventoryNumber: record.inventoryNumber
         }));
         data.splice(0, 0, {
+        	inventoryNumber: "Inventarnummer",
 			artists_list: "Künstler", 
 			title: "Titel",
 			height: "Höhe",
@@ -290,10 +296,9 @@ const exporter = (records) => {
 			showHistory: "Ausstellungshistorie",
 			literature: "Literatur",
 			provenance: "Provenienz", 
-			bio: "Biographie",
-			_id: "werkliste.ch ID"
+			bio: "Biographie"
         })
-		const headers = ['artists_list', 'title', 'height', 'width', 'depth', 'techniques_list', 'publishedYear', 'status', 'state', 'locations_list', 'sighted', 'notes_list', 'frameSize', 'insuranceValue', 'showHistory', 'literature', 'provenance', 'bio', '_id'] // order fields in the export
+		const headers = ['inventoryNumber', 'artists_list', 'title', 'height', 'width', 'depth', 'techniques_list', 'publishedYear', 'status', 'state', 'locations_list', 'sighted', 'notes_list', 'frameSize', 'insuranceValue', 'showHistory', 'literature', 'provenance', 'bio'] // order fields in the export
 		/* create a new blank workbook */
 		var wb = XLSX.utils.book_new();
 		var ws = XLSX.utils.json_to_sheet(data, { header: headers, skipHeader: true });
@@ -341,7 +346,6 @@ const WorksActions = ({
 	            filter={filterValues}
 	            sort={currentSort}
 	            exporter={exporter}
-	            maxResults={2000}
 	        />
 	    </CardActions>
     )
