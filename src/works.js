@@ -435,7 +435,7 @@ export const WorksList = (props, showNotes) => (
                         reference="artists"
                         sortBy={'_sortArtists'}
                     >
-					    <SingleFieldList>
+					    <SingleFieldList linkType={false}>
 					    	<FunctionField render={record => (
 					    		`${record.name.first} ${record.name.last}`
 					    	)}/>
@@ -449,7 +449,7 @@ export const WorksList = (props, showNotes) => (
 					    source="techniques"
 					    sortable={false}
 					>
-					    <SingleFieldList>
+					    <SingleFieldList linkType={false}>
 					        <TextField source="name" />
 					    </SingleFieldList>
 					</ReferenceArrayField>
@@ -461,7 +461,7 @@ export const WorksList = (props, showNotes) => (
 				          label="Lagerort"
 				          sortable={false}
 				        >
-					    	<SingleFieldList>
+					    	<SingleFieldList linkType={false}>
 				          		<LocationField source="name" />
 				          	</SingleFieldList>
 			        </ReferenceArrayField>
@@ -473,7 +473,7 @@ export const WorksList = (props, showNotes) => (
 					    source="notes"
 					    sortable={false}
 					>
-					    <SingleFieldList>
+					    <SingleFieldList linkType={false}>
 					        <RichTextField source="note" />
 					    </SingleFieldList>
 					</ReferenceArrayField>
