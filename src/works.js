@@ -54,6 +54,7 @@ import FilterIcon from '@material-ui/icons/Filter';
 import SightedWorksButton from './SightedWorksButton';
 import RichTextInput from 'ra-input-rich-text';
 import XLSX from 'xlsx';
+import axiosClient from './config/axios'
 
 
 const WorksFilter = (props) => (
@@ -256,57 +257,71 @@ const stripHtml = (html) => {
    return tmp.textContent || tmp.innerText || "";
 }
 
-const exporter = (records) => {
-    // will call dataProvider.getMany('posts', { ids: records.map(record => record.post_id) }), ignoring duplicate and empty post_id
-        let data = records.map(record => ({
-        		...record.dimensions,
-        		title: record.title,
-        		sighted: record.sighted ? "Ja" : "Nein",
-        		frameSize: record.frameSize,
-        		insuranceValue: record.insuranceValue,
-                artists_list: (record.artists_field && record.artists_field.length) ? record.artists_field.map(artist => `${artist.name.first} ${artist.name.last}`).toString() : "",
-                techniques_list: (record.techniques_field && record.techniques_field.length) ? record.techniques_field.map(technique => technique.name).toString() : "" ,
-                locations_list: (record.locations_field && record.locations_field.length) ? record.locations_field.map(location => location.name).toString() : "",
-                notes_list: (record.notes_field && record.notes_field.length) ? record.notes_field.map(note => stripHtml(note.note)).toString() : "",
-                publishedYear: record.publishedDate ? new Date(record.publishedDate).getFullYear() : "",
-                state: stripHtml(record.state),
-                status: stripHtml(record.status),
-                showHistory: stripHtml(record.showHistory),
-                provenance: stripHtml(record.provenance),
-                literature: stripHtml(record.literature),
-                bio: stripHtml(record.bio),
-                inventoryNumber: record.inventoryNumber
-        }));
-        data.splice(0, 0, {
-        	inventoryNumber: "Inventarnummer",
-			artists_list: "Künstler", 
-			title: "Titel",
-			height: "Höhe",
-			width: "Breite",
-			depth: "Tiefe",
-			techniques_list: "Techniken",
-			publishedYear: "Jahr",
-			status: "Status",
-			state: "Zustand",
-			locations_list: "Lagerort",
-			sighted: "gesichtet",
-			notes_list: "Notizen",
-			frameSize: "Rahmenmaß",
-			insuranceValue: "Versicherungswert",
-			showHistory: "Ausstellungshistorie",
-			literature: "Literatur",
-			provenance: "Provenienz", 
-			bio: "Biographie"
-        })
-		const headers = ['inventoryNumber', 'artists_list', 'title', 'height', 'width', 'depth', 'techniques_list', 'publishedYear', 'status', 'state', 'locations_list', 'sighted', 'notes_list', 'frameSize', 'insuranceValue', 'showHistory', 'literature', 'provenance', 'bio'] // order fields in the export
-		/* create a new blank workbook */
-		var wb = XLSX.utils.book_new();
-		var ws = XLSX.utils.json_to_sheet(data, { header: headers, skipHeader: true });
-		/* Add the worksheet to the workbook */
-		XLSX.utils.book_append_sheet(wb, ws, "Werke");
+const exporter = async (records, fetchRelatedRecords) => {
 
-		/* output format determined by filename */
-		XLSX.writeFile(wb, "Werkliste.xlsx");
+    // will call dataProvider.getMany
+    const artists = await fetchRelatedRecords(records, 'artists', 'artists')
+    const techniques = await fetchRelatedRecords(records, 'techniques', 'techniques')
+
+    let data = await Promise.all(records.map(async record => {
+    	const locations = (await axiosClient().get('locations', {params: {
+    	    	          _id: {$in: record.locations}
+    	    	        }})).data.data
+        const notes = (await axiosClient().get('notes', {params: {
+                          _id: {$in: record.notes}
+                        }})).data.data
+        console.log("locations", locations)
+    	return {
+    		...record.dimensions,
+    		title: record.title,
+    		sighted: record.sighted ? "Ja" : "Nein",
+    		frameSize: record.frameSize,
+    		insuranceValue: record.insuranceValue,
+    		artists_list: (record.artists && record.artists.length) && record.artists.map(artist => artists[artist] ? `${artists[artist].name.first} ${artists[artist].name.last}` : "").toString(),
+            techniques_list: (record.techniques && record.techniques.length) && record.techniques.map(technique => techniques[techniques] ? techniques[techniques].name : "").toString(),
+            locations_list: locations && locations.map(location => location.name).toString(),
+            notes_list: notes && notes.map(note => stripHtml(note.note)).toString(),
+            publishedYear: record.publishedDate ? new Date(record.publishedDate).getFullYear() : "",
+            state: stripHtml(record.state),
+            status: stripHtml(record.status),
+            showHistory: stripHtml(record.showHistory),
+            provenance: stripHtml(record.provenance),
+            literature: stripHtml(record.literature),
+            bio: stripHtml(record.bio),
+            inventoryNumber: record.inventoryNumber
+        }
+    }));
+    
+    data.splice(0, 0, {
+    	inventoryNumber: "Inventarnummer",
+		artists_list: "Künstler", 
+		title: "Titel",
+		height: "Höhe",
+		width: "Breite",
+		depth: "Tiefe",
+		techniques_list: "Techniken",
+		publishedYear: "Jahr",
+		status: "Status",
+		state: "Zustand",
+		locations_list: "Lagerort",
+		sighted: "gesichtet",
+		notes_list: "Notizen",
+		frameSize: "Rahmenmaß",
+		insuranceValue: "Versicherungswert",
+		showHistory: "Ausstellungshistorie",
+		literature: "Literatur",
+		provenance: "Provenienz", 
+		bio: "Biographie"
+    })
+	const headers = ['inventoryNumber', 'artists_list', 'title', 'height', 'width', 'depth', 'techniques_list', 'publishedYear', 'status', 'state', 'locations_list', 'sighted', 'notes_list', 'frameSize', 'insuranceValue', 'showHistory', 'literature', 'provenance', 'bio'] // order fields in the export
+	/* create a new blank workbook */
+	var wb = XLSX.utils.book_new();
+	var ws = XLSX.utils.json_to_sheet(data, { header: headers, skipHeader: true });
+	/* Add the worksheet to the workbook */
+	XLSX.utils.book_append_sheet(wb, ws, "Werke");
+
+	/* output format determined by filename */
+	XLSX.writeFile(wb, "Werkliste.xlsx");
     
 }
 
@@ -401,7 +416,6 @@ export const WorksList = (props, showNotes) => (
 				          		<LocationField source="name" />
 				          	</SingleFieldList>
 			        </ReferenceArrayField>
-					<ShowButton />
 		            <EditButton />
 		        </Datagrid>
             }
@@ -415,7 +429,7 @@ export const WorksList = (props, showNotes) => (
                         reference="artists"
                         sortBy={'_sortArtists'}
                     >
-					    <SingleFieldList>
+					    <SingleFieldList linkType={false}>
 					    	<FunctionField render={record => (
 					    		`${record.name.first} ${record.name.last}`
 					    	)}/>
@@ -429,7 +443,7 @@ export const WorksList = (props, showNotes) => (
 					    source="techniques"
 					    sortable={false}
 					>
-					    <SingleFieldList>
+					    <SingleFieldList linkType={false}>
 					        <TextField source="name" />
 					    </SingleFieldList>
 					</ReferenceArrayField>
@@ -441,7 +455,7 @@ export const WorksList = (props, showNotes) => (
 				          label="Lagerort"
 				          sortable={false}
 				        >
-					    	<SingleFieldList>
+					    	<SingleFieldList linkType={false}>
 				          		<LocationField source="name" />
 				          	</SingleFieldList>
 			        </ReferenceArrayField>
@@ -453,7 +467,7 @@ export const WorksList = (props, showNotes) => (
 					    source="notes"
 					    sortable={false}
 					>
-					    <SingleFieldList>
+					    <SingleFieldList linkType={false}>
 					        <RichTextField source="note" />
 					    </SingleFieldList>
 					</ReferenceArrayField>
@@ -461,7 +475,6 @@ export const WorksList = (props, showNotes) => (
 			        }
 
 					<ImagesField label="Abbildungen" sortable={false}/>
-					<ShowButton />
 		            <EditButton />
 		        </Datagrid>
         }
