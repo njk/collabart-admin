@@ -3,7 +3,7 @@ import { List, Edit, Create, Datagrid, EditButton, SimpleForm, TextInput, Filter
 
 const ArtistsFilter = (props) => (
     <Filter {...props}>
-        <TextInput label="Suche" source="name.last" alwaysOn />
+        <TextInput label="Nachname" source="name.last" alwaysOn />  
     </Filter>
 );
 
