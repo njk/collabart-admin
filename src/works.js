@@ -422,7 +422,6 @@ export const WorksList = (props, showNotes) => (
 				          		<LocationField source="name" />
 				          	</SingleFieldList>
 			        </ReferenceArrayField>
-					<ShowButton />
 		            <EditButton />
 		        </Datagrid>
             }
@@ -482,7 +481,6 @@ export const WorksList = (props, showNotes) => (
 			        }
 
 					<ImagesField label="Abbildungen" sortable={false}/>
-					<ShowButton />
 		            <EditButton />
 		        </Datagrid>
         }
