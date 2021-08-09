@@ -45,6 +45,7 @@ export const ArtistsEdit = (props) => (
                 }
               }
             </FormDataConsumer>
+            <BooleanInput source="showDetails" label="Werkdetails immer anzeigen"/>              
             <RichTextInput source="vita" />
         </SimpleForm>
     </Edit>
@@ -56,6 +57,7 @@ export const ArtistsCreate = (props) => (
             <TextInput label="Vorname" source="name.first"/>
             <TextInput label="Nachname" source="name.last"/>
             <BooleanInput source="isPublic" label="öffentlich"/>
+            <BooleanInput source="showDetails" label="Werkdetails immer anzeigen"/>
             <RichTextInput source="vita" />
         </SimpleForm>
     </Create>
