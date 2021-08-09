@@ -575,6 +575,8 @@ export const WorksEdit = (props) => (
 				<TextInput source="dateDivider" label="Trennzeichen (z.B. /)" />
 				<BooleanInput source="isDateNotExact" label="ungenaue Jahresangabe"/>
 				<BooleanInput source="isDateUnknown" label="Jahr unbekannt"/>
+				<TextInput source="wvz" label="Werkverzeichnisnummer" />
+				<TextInput source="signature" label="Signatur/Bezeichnung" />
 		    </FormTab>
 		    <FormTab label="Lagerinformationen" path="locations">
 		    	<TextInput source="inventoryNumber" label="Inventarnummer"/>
