@@ -167,10 +167,7 @@ const LocationButtonAdd = ( { record }) =>
 
 const WarehouseInfo = ( { record }) => 
 {
-	return (<span>
-				Zustand: <div dangerouslySetInnerHTML={{__html: record.state}}></div><br/>
-				Status: {record.status}
-			</span>)
+	return (<span>{record.status}</span>)
 }
 
 const LocationField = ( { record }) =>
@@ -379,11 +376,9 @@ const WorksBulkActionButtons = props => (
     </Fragment>
 );
 
-let showNotes = true;
+const WorksPagination = props => <Pagination rowsPerPageOptions={[10, 20, 50]} {...props} />
 
-const WorksPagination = props => <Pagination rowsPerPageOptions={[10, 20, 50, 150]} {...props} />
-
-export const WorksList = (props, showNotes) => (
+export const WorksList = (props) => (
 	<List {...props} 
 		title="Werke"
 		filters={<WorksFilter />}
@@ -428,6 +423,7 @@ export const WorksList = (props, showNotes) => (
         large={
 		        <Datagrid rowClick="show">
 		        	<TextField source="inventoryNumber" label="Inventarnummer"/>
+		        	<TextField source="wvz" label="Werkverzeichnisnummer"/>
 		            <SmallImageField source="image" label="Abbildung" width="200" sortable={false}/>
 					<ReferenceArrayField
                         label="Künstler"
@@ -454,7 +450,7 @@ export const WorksList = (props, showNotes) => (
 					    </SingleFieldList>
 					</ReferenceArrayField>
 					<YearField label="Jahr" sortBy="publishedDate"/>
-					<WarehouseInfo label="Infos" sortable={false}/>
+					<WarehouseInfo label="Status" sortable={false}/>
 					<ReferenceArrayField
 				          reference="locations"
 				          source="locations"
@@ -466,20 +462,6 @@ export const WorksList = (props, showNotes) => (
 				          	</SingleFieldList>
 			        </ReferenceArrayField>
 					<BooleanField source="sighted" label="gesichtet"/>
-			        { showNotes ?
-			        	<ReferenceArrayField
-					    label="Notizen"
-					    reference="notes"
-					    source="notes"
-					    sortable={false}
-					>
-					    <SingleFieldList linkType={false}>
-					        <RichTextField source="note" />
-					    </SingleFieldList>
-					</ReferenceArrayField>
-					: <span>Hallo</span>
-			        }
-
 					<ImagesField label="Abbildungen" sortable={false}/>
 		            <EditButton />
 		        </Datagrid>
