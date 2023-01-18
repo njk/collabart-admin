@@ -59,12 +59,25 @@ const WorksFilter = (props) => (
 
 const SmallImageField = ({ record, width }) => {
   if (record && record.image && record.image.s3_url) {
+    const imageUrl = new URL(record.image.s3_url);
+    const imageKey = imageUrl.pathname.substring(1);
+    const body = {
+      bucket: process.env.REACT_APP_S3_BUCKET_NAME,
+      key: imageKey,
+      edits: {
+        resize: {
+          width: width,
+          fit: "contain",
+        },
+      },
+    };
+    const imageRequest = JSON.stringify(body);
+    const url = `${process.env.REACT_APP_CLOUDFRONT_API_ENDPOINT}/${btoa(
+      imageRequest
+    )}`;
     return (
       <span>
-        <Image publicId={record.image.s3_url} secure="true" type="fetch">
-          <Transformation width={width} crop="fill" />
-          <Transformation fetchFormat="auto" quality="80" />
-        </Image>
+        <img src={url} />
       </span>
     );
   }
@@ -204,12 +217,7 @@ const WorkImageCloudinaryInput = ({ record }) => {
 
 const CloudinaryImageField = ({ record }) => {
   if (record && record.s3_url) {
-    return (
-      <Image publicId={record.s3_url} secure="true" type="fetch">
-        <Transformation width="400" crop="fill" />
-        <Transformation fetchFormat="auto" quality="80" />
-      </Image>
-    );
+    return <SmallImageField width="400" record={{ image: record }} />;
   }
   return record ? (
     <Image publicId={record.public_id} secure="true">
