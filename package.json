@@ -17,7 +17,8 @@
     "ra-language-german": "^3.13.5",
     "react": "^18.2.0",
     "react-admin": "^4.13.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-scripts": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -41,8 +42,5 @@
   "engines": {
     "npm": "^8.0.0",
     "node": "^16.13.1"
-  },
-  "devDependencies": {
-    "react-scripts": "^5.0.1"
   }
 }
