@@ -1,7 +1,6 @@
 import React, { Fragment } from "react";
 import {
   Show,
-  Responsive,
   FormTab,
   TabbedForm,
   TabbedShowLayout,
@@ -35,27 +34,24 @@ import {
   Pagination,
   DeleteWithConfirmButton,
 } from "react-admin";
-import CloudinaryWorkImage from "./CloudinaryWorkImage";
 import { Image, Transformation } from "cloudinary-react";
 import { EditImageButton, CreateImageButton } from "./ImageButtons";
 import { CreateLocationButton } from "./LocationButtons";
 import { EditNoteButton, CreateNoteButton } from "./NoteButtons";
-import FilterIcon from "@material-ui/icons/Filter";
+import FilterIcon from "@mui/icons-material/Filter";
 import SightedWorksButton from "./SightedWorksButton";
 import RichTextInput from "ra-input-rich-text";
 import XLSX from "xlsx";
 import axiosClient from "./config/axios";
 
-const WorksFilter = (props) => (
-  <Filter {...props}>
-    <TextInput label="Titel" source="title" alwaysOn />
-    <TextInput label="Künstler" source="artistQuery" alwaysOn />
-    <TextInput label="Techniken" source="techniqueQuery" />
-    <TextInput label="Notizen" source="notesQuery" />
-    <TextInput label="Lagerort" source="locationQuery" />
-    <BooleanInput label="gesichtet" source="sighted" />
-  </Filter>
-);
+const worksFilters = [
+  <TextInput label="Titel" source="title" alwaysOn />,
+  <TextInput label="Künstler" source="artistQuery" alwaysOn />,
+  <TextInput label="Techniken" source="techniqueQuery" />,
+  <TextInput label="Notizen" source="notesQuery" />,
+  <TextInput label="Lagerort" source="locationQuery" />,
+  <BooleanInput label="gesichtet" source="sighted" />,
+];
 
 const SmallImageField = ({ record, width }) => {
   if (record && record.image && record.image.s3_url) {
@@ -209,10 +205,6 @@ const YearField = ({ record }) => {
     return <span>{new Date(record.publishedDate).getFullYear()}</span>;
   }
   return <span></span>;
-};
-
-const WorkImageCloudinaryInput = ({ record }) => {
-  return <CloudinaryWorkImage record={record} />;
 };
 
 const CloudinaryImageField = ({ record }) => {
@@ -419,108 +411,68 @@ const WorksBulkActionButtons = (props) => (
 );
 
 const WorksPagination = (props) => (
-  <Pagination rowsPerPageOptions={[10, 20, 50]} {...props} />
+  <Pagination rowsPerPageOptions={[20, 40, 100]} {...props} />
 );
 
 export const WorksList = (props) => (
   <List
     {...props}
     title="Werke"
-    filters={<WorksFilter />}
-    bulkActionButtons={false}
+    filters={worksFilters}
     actions={<WorksActions />}
     perPage={20}
     pagination={<WorksPagination />}
     sort={{ field: "_sortArtists", order: "ASC" }}
   >
-    <Responsive
-      medium={
-        <Datagrid rowClick="show">
-          <TextField source="inventoryNumber" label="Inventarnummer" />
-          <SmallImageField
-            source="image"
-            label="Abbildung"
-            width="25"
-            sortable={false}
+    <Datagrid rowClick="show" bulkActionButtons={false}>
+      <TextField source="inventoryNumber" label="Inventarnummer" />
+      <TextField source="wvz" label="Werkverzeichnisnummer" />
+      <SmallImageField
+        source="image"
+        label="Abbildung"
+        width="200"
+        sortable={false}
+      />
+      <ReferenceArrayField
+        label="Künstler"
+        source="artists"
+        reference="artists"
+        sortBy={"_sortArtists"}
+      >
+        <SingleFieldList linkType={false}>
+          <FunctionField
+            render={(record) => `${record.name.first} ${record.name.last}`}
           />
-          <ReferenceArrayField
-            label="Künstler"
-            source="artists"
-            reference="artists"
-            sortBy={"_sortArtists"}
-          >
-            <SingleFieldList>
-              <FunctionField
-                render={(record) => `${record.name.first} ${record.name.last}`}
-              />
-            </SingleFieldList>
-          </ReferenceArrayField>
-          <TextField source="title" label="Titel" />
-          <ReferenceArrayField
-            reference="locations"
-            source="locations"
-            label="Lagerort"
-            sortBy={"locations.0"}
-          >
-            <SingleFieldList>
-              <LocationField source="name" />
-            </SingleFieldList>
-          </ReferenceArrayField>
-          <EditButton />
-        </Datagrid>
-      }
-      large={
-        <Datagrid rowClick="show">
-          <TextField source="inventoryNumber" label="Inventarnummer" />
-          <TextField source="wvz" label="Werkverzeichnisnummer" />
-          <SmallImageField
-            source="image"
-            label="Abbildung"
-            width="200"
-            sortable={false}
-          />
-          <ReferenceArrayField
-            label="Künstler"
-            source="artists"
-            reference="artists"
-            sortBy={"_sortArtists"}
-          >
-            <SingleFieldList linkType={false}>
-              <FunctionField
-                render={(record) => `${record.name.first} ${record.name.last}`}
-              />
-            </SingleFieldList>
-          </ReferenceArrayField>
-          <TextField source="title" label="Titel" />
-          <DimensionsField label="Maße" source="dimensions" />
-          <ReferenceArrayField
-            label="Techniken"
-            reference="techniques"
-            source="techniques"
-            sortable={false}
-          >
-            <SingleFieldList linkType={false}>
-              <TextField source="name" />
-            </SingleFieldList>
-          </ReferenceArrayField>
-          <YearField label="Jahr" sortBy="publishedDate" />
-          <WarehouseInfo label="Status" sortable={false} />
-          <ReferenceArrayField
-            reference="locations"
-            source="locations"
-            label="Lagerort"
-            sortable={false}
-          >
-            <SingleFieldList linkType={false}>
-              <LocationField source="name" />
-            </SingleFieldList>
-          </ReferenceArrayField>
-          <BooleanField source="sighted" label="gesichtet" />
-          <ImagesField label="Abbildungen" sortable={false} />
-          <EditButton />
-        </Datagrid>
-      }
-    />
+        </SingleFieldList>
+      </ReferenceArrayField>
+      <TextField source="title" label="Titel" />
+      <DimensionsField label="Maße" source="dimensions" />
+      <ReferenceArrayField
+        label="Techniken"
+        reference="techniques"
+        source="techniques"
+        sortable={false}
+      >
+        <SingleFieldList linkType={false}>
+          <TextField source="name" />
+        </SingleFieldList>
+      </ReferenceArrayField>
+      <YearField label="Jahr" sortBy="publishedDate" />
+      <WarehouseInfo label="Status" sortable={false} />
+      <ReferenceArrayField
+        reference="locations"
+        source="locations"
+        label="Lagerort"
+        sortable={false}
+      >
+        <SingleFieldList linkType={false}>
+          <LocationField source="name" />
+        </SingleFieldList>
+      </ReferenceArrayField>
+      <BooleanField source="sighted" label="gesichtet" />
+      <ImagesField label="Abbildungen" sortable={false} />
+      <EditButton />
+    </Datagrid>
   </List>
 );
 
@@ -557,7 +509,6 @@ export const WorksEdit = (props) => (
     <TabbedForm toolbar={<WorksEditToolbar />}>
       <FormTab label="Hauptinformationen">
         <SmallImageField source="image" label="Abbildung" width="400" />
-        <WorkImageCloudinaryInput />
         <ReferenceArrayInput
           source="artists"
           reference="artists"
