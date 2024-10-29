@@ -29,6 +29,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "dev": "react-scripts start",
     "heroku-postbuild": "react-scripts build",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
