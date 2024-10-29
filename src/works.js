@@ -307,6 +307,7 @@ const exporter = async (records, fetchRelatedRecords) => {
         literature: stripHtml(record.literature),
         bio: stripHtml(record.bio),
         inventoryNumber: record.inventoryNumber,
+        signature: record.signature,
       };
     })
   );
@@ -332,6 +333,7 @@ const exporter = async (records, fetchRelatedRecords) => {
     literature: "Literatur",
     provenance: "Provenienz",
     bio: "Biographie",
+    signature: "Signatur/Bezeichnung",
   });
   const headers = [
     "inventoryNumber",
@@ -354,6 +356,7 @@ const exporter = async (records, fetchRelatedRecords) => {
     "literature",
     "provenance",
     "bio",
+    "signature",
   ]; // order fields in the export
   /* create a new blank workbook */
   var wb = XLSX.utils.book_new();
